@@ -1,0 +1,89 @@
+# Konya'da Trafik — otomatik story sistemi ayarları
+# Saatler İstanbul saatidir. GitHub her 15 dakikada bir sistemi uyandırır,
+# sistem de saati gelmiş ama henüz yapılmamış görevleri çalıştırır.
+
+sayfa:
+  ad: "Konya'da Trafik"
+  instagram: "konyada_trafik"
+  facebook_sayfa_id: "1126140313914983"
+
+instagram:
+  graph_api_surum: "v23.0"
+  # Boş bırakılırsa Facebook sayfasına bağlı Instagram hesabı otomatik bulunur.
+  instagram_hesap_id: ""
+
+tasarim:
+  # Renkler Konya'da Trafik şablonlarından alındı; değiştirmek için buraya "#RRGGBB" yazın.
+  yesil: "#0E953F"        # bölüm başlıkları, kategori etiketi, çizgiler
+  acik_yesil: "#78D296"   # "KONYA'DA BUGÜN", çerçeveli etiketler, kapanış cümlesi
+  kirmizi: "#D62828"      # haber konum etiketi
+  zemin: "#0A1810"        # haber zemini
+  logo: "assets/logo.png"
+  jpeg_kalite: 90
+
+eczane:
+  # "merkez" = Selçuklu, Meram, Karatay. İlçeleri de eklemek için: [merkez, ilceler]
+  bolumler: [merkez]
+  yedek_ilceler: ["Selçuklu", "Meram", "Karatay"]   # yedek kaynak (posta.com.tr) için filtre
+
+vefat:
+  sayfa_basina: 15
+
+haber:
+  model: "claude-sonnet-5-5"
+  en_fazla_arama: 3
+  # Aynı haberi tekrar paylaşmamak için kaç günlük geçmiş hatırlansın
+  gecmis_gun: 5
+  # Haber fotoğrafı için sırayla denenecek kaynaklar:
+  #   ajans = abone ajansın/resmi kurumun haber fotoğrafı, resmi = resmi kurum sitesindeki fotoğraf,
+  #   arsiv = assets/fotograflar ilçe/kategori klasörü, yapay_zeka = temsili görsel, arsiv_genel = "genel" klasörü
+  gorsel_sirasi: [ajans, resmi, arsiv, yapay_zeka, arsiv_genel]
+  yapay_zeka_modeli: "@cf/black-forest-labs/flux-1-schnell"
+
+# Abone olunan ajanslar ve resmi kurumlar: haberler önce buradan seçilir, fotoğrafı da buradan gelir.
+# Ajanslar API vermediği için kendi sitelerindeki herkese açık Konya sayfaları okunur (abonelik kapsamında).
+ajans:
+  son_saat: 24          # kaç saatlik haberler aday olsun
+  en_fazla_makale: 6    # her liste sayfasından okunacak en fazla haber
+  en_fazla_aday: 25     # yapay zekâya gösterilecek en fazla aday
+  kaynaklar:
+    - ad: "İHA"
+      kredi: "Foto: İHA"
+      liste: "https://www.iha.com.tr/konya-haberleri"
+      makale_deseni: "/konya-haberleri/[a-z0-9-]+-\\d+"
+      hepsi_konya: true
+    - ad: "DHA"
+      kredi: "Foto: DHA"
+      liste: "https://www.dha.com.tr/yerel-haberler/konya/"
+      makale_deseni: "/yerel-haberler/konya/[a-z0-9-]+-\\d+"   # ilk 'kontrol' çalıştırmasında doğrulanacak
+      hepsi_konya: true
+    - ad: "AA"
+      kredi: "Foto: AA"
+      tur: rss
+      adresler:
+        - "https://www.aa.com.tr/tr/rss/default?cat=guncel"
+        - "https://www.aa.com.tr/tr/rss/default?cat=yasam"
+        - "https://www.aa.com.tr/tr/rss/default?cat=spor"
+    - ad: "Selçuklu Belediyesi"
+      kredi: "Foto: Selçuklu Belediyesi"
+      liste: "https://www.selcuklu.bel.tr/p/haberler/"
+      makale_deseni: "/p/haber/\\d+/[a-z0-9-]+/?"
+      hepsi_konya: true
+      resmi: true
+
+zamanlama:
+  - {saat: "08:00", gorev: soz}
+  - {saat: "08:45", gorev: eczane}
+  - {saat: "09:30", gorev: haber, tur: genel}
+  - {saat: "11:00", gorev: vefat}
+  - {saat: "11:30", gorev: haber, tur: trafik}
+  - {saat: "12:30", gorev: haber, tur: selcuklu}
+  - {saat: "13:30", gorev: haber, tur: buyuksehir}
+  - {saat: "15:30", gorev: haber, tur: genel}
+  - {saat: "17:30", gorev: haber, tur: konyaspor}
+  - {saat: "19:30", gorev: haber, tur: genel}
+  - {saat: "21:00", gorev: vefat}
+
+# Bir görev saatinden en fazla kaç dakika sonra hâlâ çalıştırılabilir
+# (GitHub gecikmeleri ve verinin geç güncellenmesi için).
+tolerans_dakika: 150
