@@ -1,0 +1,16 @@
+HABER FOTOĞRAFLARI
+==================
+Haber story'lerinin üst kısmına konacak fotoğraflar bu klasörden seçilir.
+Haber sitelerinin fotoğrafları telifli olduğu için sistem onları indirmez.
+
+Klasör adları küçük harf ve Türkçe karaktersiz yazılır. Sistem sırasıyla şunlara bakar:
+  1) İlçe/semt klasörü:  kulu, selcuklu, meram, karatay, eregli, aksehir, beysehir, cumra, ...
+  2) Kategori klasörü:    trafik, kaza, sorusturma, asayis, yangin, buyuksehir, gundem,
+                          konyaspor, ekonomi, egitim, saglik, hava-durumu, son-dakika
+  3) genel:               her habere uyabilecek Konya fotoğrafları
+
+Örnek: assets/fotograflar/trafik/mevlana-caddesi.jpg
+       assets/fotograflar/buyuksehir/belediye-binasi.jpg
+       assets/fotograflar/genel/konya-panorama.jpg
+
+Yatay ya da dikey olabilir; sistem otomatik kırpar. Uygun fotoğraf yoksa haber fotoğrafsız tasarımla basılır.
