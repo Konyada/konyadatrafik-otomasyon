@@ -1,0 +1,498 @@
+[
+ {
+  "soz": "Damlaya damlaya göl olur.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Sakla samanı, gelir zamanı.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Ağaç yaşken eğilir.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Bugünün işini yarına bırakma.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Komşu komşunun külüne muhtaçtır.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Bir elin nesi var, iki elin sesi var.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Sabreden derviş muradına ermiş.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Ne ekersen onu biçersin.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "İşleyen demir ışıldar.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Tatlı dil yılanı deliğinden çıkarır.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Acele işe şeytan karışır.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Ak akçe kara gün içindir.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Ayağını yorganına göre uzat.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Bin bilsen de bir bilene danış.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Birlikten kuvvet doğar.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Âyinesi iştir kişinin, lâfa bakılmaz.",
+  "kaynak": "Ziya Paşa"
+ },
+ {
+  "soz": "Dost kara günde belli olur.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Emek olmadan yemek olmaz.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "İyilik eden iyilik bulur.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Kervan yolda düzülür.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Söz gümüşse sükût altındır.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Taşıma suyla değirmen dönmez.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Üzüm üzüme baka baka kararır.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Yalancının mumu yatsıya kadar yanar.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Akıl akıldan üstündür.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Ateş düştüğü yeri yakar.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Bal tutan parmağını yalar.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Çok bilen çok yanılır.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Dağ dağa kavuşmaz, insan insana kavuşur.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Davulun sesi uzaktan hoş gelir.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Gülü seven dikenine katlanır.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Hatasız kul olmaz.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Keskin sirke küpüne zarar.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Lafla peynir gemisi yürümez.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Meyve veren ağacı taşlarlar.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Nerede birlik, orada dirlik.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Öfkeyle kalkan zararla oturur.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Rüzgâr eken fırtına biçer.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Sona kalan dona kalır.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Üzüm yiyin, bağını sormayın.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Zararın neresinden dönülse kârdır.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Ağlamayan çocuğa meme vermezler.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Balık baştan kokar.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Söz ola kese savaşı, söz ola kestire başı.",
+  "kaynak": "Yunus Emre"
+ },
+ {
+  "soz": "Can çıkmayınca huy çıkmaz.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Eski dost düşman olmaz.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Güneş balçıkla sıvanmaz.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "İt ürür, kervan yürür.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Kaz gelecek yerden tavuk esirgenmez.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Kendi düşen ağlamaz.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Misafir umduğunu değil, bulduğunu yer.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Perşembenin gelişi çarşambadan bellidir.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Sütten ağzı yanan yoğurdu üfleyerek yer.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Terzi kendi söküğünü dikemez.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Yuvayı dişi kuş yapar.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Zorla güzellik olmaz.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Bir kahvenin kırk yıl hatırı vardır.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Dil kılıçtan keskindir.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Her yokuşun bir inişi vardır.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "İğneyi kendine, çuvaldızı başkasına batır.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Komşuda pişer, bize de düşer.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Yol yürümekle, borç ödemekle biter.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Bin işit, bir söyle.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Dost acı söyler.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Eğri otur, doğru konuş.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Haydan gelen huya gider.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Su uyur, düşman uyumaz.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Yarım hekim candan, yarım hoca dinden eder.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Yumuşak huylu atın çiftesi pek olur.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Sağlam kafa sağlam vücutta bulunur.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Olmaz olmaz deme, olmaz olmaz.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Gelin tanış olalım, işi kolay kılalım; sevelim sevilelim, dünya kimseye kalmaz.",
+  "kaynak": "Yunus Emre"
+ },
+ {
+  "soz": "Ne doğrarsan aşına, o çıkar kaşığına.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Az veren candan, çok veren maldan verir.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Çok yaşayan bilmez, çok gezen bilir.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Gönül ne kahve ister ne kahvehane, gönül sohbet ister kahve bahane.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "İki gönül bir olunca samanlık seyran olur.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Mart kapıdan baktırır, kazma kürek yaktırır.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Aç ayı oynamaz.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Azıcık aşım, kaygısız başım.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Bakarsan bağ, bakmazsan dağ olur.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Bilmemek ayıp değil, sormamak ayıptır.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Bin ölçüp bir biçmeli.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Boş çuval dik durmaz.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Çalma elin kapısını, çalarlar kapını.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Demir tavında dövülür.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Dereyi görmeden paçaları sıvama.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "El elden üstündür.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Görünen köy kılavuz istemez.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Hamama giren terler.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Her işte bir hayır vardır.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "İnsan yedisinde ne ise yetmişinde de odur.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Başkasına kuyu kazan, kendisi düşer.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Minareyi çalan kılıfını hazırlar.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Önce can, sonra canan.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Parayı veren düdüğü çalar.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Sabır acıdır, meyvesi tatlıdır.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Sel gider, kum kalır.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Tok açın halinden bilmez.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Bir ben vardır bende, benden içeru.",
+  "kaynak": "Yunus Emre"
+ },
+ {
+  "soz": "Vakit nakittir.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Yerin kulağı var.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Yorgan gitti, kavga bitti.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Gün doğmadan neler doğar.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Hak yerini bulur.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Az olsun, öz olsun.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Bin dost az, bir düşman çok.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Ak koyunun kara kuzusu da olur.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Kul sıkışmayınca Hızır yetişmez.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Su testisi su yolunda kırılır.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Söyleyenden dinleyen arif gerek.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Ummadığın taş baş yarar.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Gülme komşuna, gelir başına.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Denize düşen yılana sarılır.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Mum dibine ışık vermez.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Yiğit düştüğü yerden kalkar.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Tek kanatla kuş uçmaz.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Bir musibet bin nasihatten yeğdir.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Ateş olmayan yerden duman çıkmaz.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Dikensiz gül olmaz.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Yuvarlanan taş yosun tutmaz.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Damdan düşen halini damdan düşen bilir.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Kızım sana söylüyorum, gelinim sen anla.",
+  "kaynak": "Atasözü"
+ },
+ {
+  "soz": "Al gülüm, ver gülüm.",
+  "kaynak": "Atasözü"
+ }
+]
