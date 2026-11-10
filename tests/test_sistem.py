@@ -54,76 +54,72 @@ def test_eczane_resmi_site_ilceler_dahil():
 
 
 class _EczaneOturumu:
-    """GET: sayfa HTML'i (veya yedek), POST: veri.php yanıtı. Hata vermesi istenen adresler için istisna atar."""
+    """GET isteklerine adrese göre sahte yanıt verir; listede olmayan adres 503 döner."""
 
-    def __init__(self, sayfa, veri=None, yedek=None, veri_hatasi=None):
-        self.sayfa, self.veri, self.yedek, self.veri_hatasi = sayfa, veri, yedek, veri_hatasi
-        self.postlar = []
+    def __init__(self, sayfalar: dict):
+        self.sayfalar, self.istekler = sayfalar, []
 
     class _Yanit:
-        def __init__(self, metin="", veri=None, kod=200):
-            self.text, self._veri, self.status_code = metin, veri, kod
+        def __init__(self, metin="", kod=200):
+            self.text, self.status_code = metin, kod
 
         def raise_for_status(self):
             if self.status_code >= 400:
                 raise RuntimeError(f"HTTP {self.status_code}")
 
-        def json(self):
-            return self._veri
-
     def get(self, url, **kw):
-        if url == eczane.RESMI_URL:
-            return self._Yanit(self.sayfa)
-        if url == eczane.YEDEK_URL and self.yedek is not None:
-            return self._Yanit(self.yedek)
-        return self._Yanit(kod=503)
+        self.istekler.append(url)
+        return self._Yanit(self.sayfalar[url]) if url in self.sayfalar else self._Yanit(kod=503)
 
-    def post(self, url, **kw):
-        self.postlar.append((url, kw))
-        if self.veri_hatasi:
-            return self._Yanit(kod=self.veri_hatasi)
-        return self._Yanit(veri=self.veri)
+    def post(self, url, **kw):                     # Oda sitesinin kapalı veri adresine istek atılmamalı
+        raise AssertionError(f"POST beklenmiyordu: {url}")
 
 
-def _canli():
-    import json
+def _canli_ve_yedek():
     return ((FX / "eczane_resmi_canli.html").read_text(encoding="utf-8"),
-            json.loads((FX / "eczane_veri.json").read_text(encoding="utf-8")))
+            (FX / "eczane_posta.html").read_text(encoding="utf-8"))
 
 
-def test_eczane_canli_yapi_veri_php():
-    html, veri = _canli()
-    o = _EczaneOturumu(html, veri)
-    liste = eczane.getir(o, date(2026, 11, 10), log=lambda *_: None)
-    url, kw = o.postlar[0]
-    assert url == "https://www.konyanobetcieczaneleri.com/nobet/onyuz/veri.php"
-    assert kw["data"]["j"] == "TEST-ANAHTAR" and kw["data"]["cf"] == "" and kw["headers"]["Accept"] == "application/json"
-    assert liste.kaynak == eczane.RESMI_AD and liste.baslangic == date(2026, 11, 10)
+def test_eczane_oda_listesi_yedek_telefonlarla_birlesir():
+    html, yedek = _canli_ve_yedek()
+    liste = eczane.getir(_EczaneOturumu({eczane.RESMI_URL: html, eczane.YEDEK_URL: yedek}), date(2026, 11, 10),
+                         log=lambda *_: None)
+    assert liste.kaynak.startswith(eczane.RESMI_AD) and liste.baslangic == date(2026, 11, 10)
+    assert liste.pencere == "10 Kasım 08:30 – 11 Kasım 08:30"
+    assert [e.ad for e in liste.eczaneler] == ["Örnek Eczanesi", "Deneme Eczanesi", "Yeşil Eczanesi", "Mavi Eczanesi"]
     assert [e.tel for e in liste.eczaneler] == ["0332 000 00 01", "0332 000 00 02", "0332 000 00 03", "0332 000 00 04"]
-    yesil = liste.eczaneler[2]
-    assert yesil.kapsam == "Karatay - Meram" and yesil.ilce == "Karatay" and yesil.tarif == "Ticaret Borsası Yanı"
-    # gruplar nöbet bölgesine göre değil eczanenin bulunduğu ilçeye göre: 3 başlık
+    yesil = liste.eczaneler[2]                        # "Yesil" yazımı da eşleşir; ilçe bölgeden değil adresten
+    assert yesil.kapsam == "Karatay - Meram" and yesil.ilce == "Karatay"
     gruplar = eczane.ilceye_gore(liste.eczaneler)
     assert [(g, [e["ad"] for e in es]) for g, es in gruplar] == [
         ("Selçuklu", ["Örnek Eczanesi", "Deneme Eczanesi"]), ("Meram", ["Mavi Eczanesi"]), ("Karatay", ["Yeşil Eczanesi"])]
-    assert gruplar[0][1][1]["tarif"] == "Hocacihan Mh. Deneme Sk. No: 2"        # tarif yoksa adres
+    assert gruplar[0][1][1]["tarif"] == "Hocacihan Mh., Şehit Ali Dığrak Cd. No:1/A-B"   # kısaltılmış adres
 
 
-def test_eczane_ayrinti_alinamazsa_yedek_sonra_telefonsuz():
-    html, _ = _canli()
-    yedek = (FX / "eczane_posta.html").read_text(encoding="utf-8")
-    liste = eczane.getir(_EczaneOturumu(html, veri_hatasi=403, yedek=yedek), date(2026, 11, 10),
-                         yedek_ilceler=["Selçuklu", "Meram", "Karatay"], log=lambda *_: None)
-    assert liste.kaynak == eczane.YEDEK_AD and liste.eczaneler[0].tel == "0332 000 00 01"
-    liste = eczane.getir(_EczaneOturumu(html, veri_hatasi=403), date(2026, 11, 10), log=lambda *_: None)
+def test_eczane_kaynaklardan_biri_yoksa():
+    html, yedek = _canli_ve_yedek()
+    liste = eczane.getir(_EczaneOturumu({eczane.RESMI_URL: html}), date(2026, 11, 10), log=lambda *_: None)
     assert liste.kaynak == eczane.RESMI_AD and len(liste.eczaneler) == 4 and not any(e.tel for e in liste.eczaneler)
-    assert liste.eczaneler[0].adres == ""                                        # "Yükleniyor…" alınmadı
+    assert liste.eczaneler[0].adres == ""                                     # "Yükleniyor…" alınmadı
+    liste = eczane.getir(_EczaneOturumu({eczane.YEDEK_URL: yedek}), date(2026, 11, 10),
+                         yedek_ilceler=["Selçuklu", "Meram", "Karatay"], log=lambda *_: None)
+    assert liste.kaynak == eczane.YEDEK_AD and len(liste.eczaneler) == 4     # Ahırlı süzüldü
+    with pytest.raises(RuntimeError):
+        eczane.getir(_EczaneOturumu({}), date(2026, 11, 10), log=lambda *_: None)
+
+
+def test_adres_kisaltma():
+    assert eczane.adres_kisalt("Dumlupınar Mahallesi, Lale Caddesi, İstek Sokak, Selçuklu AVM No:4/6-B Selçuklu",
+                               "Selçuklu") == "Dumlupınar Mh., Lale Cd., İstek Sk., Selçuklu AVM No:4/6-B"
+    assert eczane.adres_kisalt("Akabe Mahallesi, Cemil Çiçek Caddesi, No:28/L Karatay/ Konya", "Karatay") == \
+        "Akabe Mh., Cemil Çiçek Cd., No:28/L"
+    assert eczane.adres_kisalt("Ferhuniye Mh. Parsana Cd. No: 20A · Selçuklu") == "Ferhuniye Mh. Parsana Cd. No: 20A"
 
 
 def test_eczane_yedek_kaynak():
     liste = eczane.yedek_coz((FX / "eczane_posta.html").read_text(encoding="utf-8"), ["Selçuklu", "Meram", "Karatay"])
     assert liste.baslangic == date(2026, 11, 10)
-    assert len(liste.eczaneler) == 1
+    assert len(liste.eczaneler) == 4                       # Ahırlı süzüldü
     e = liste.eczaneler[0]
     assert e.ad == "Örnek Eczanesi" and e.adres == "Ferhuniye Mh. Örnek Cd. No: 1" and e.tel == "0332 000 00 01"
 
