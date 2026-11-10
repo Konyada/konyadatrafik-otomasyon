@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Callable
 
@@ -51,14 +51,20 @@ def soz(b: Baglam, slot: dict) -> Sonuc:
     return Sonuc("paylasildi", f"Günün sözü: {s['soz']}", yollar, medya, adresler)
 
 
+def nobet_gecerli_mi(baslangic, simdi: datetime, saat: int = 8, dakika: int = 30) -> bool:
+    """Merkez nöbeti başlangıç günü 08:30'dan ertesi gün 08:30'a kadar sürer."""
+    bas = datetime(baslangic.year, baslangic.month, baslangic.day, saat, dakika, tzinfo=simdi.tzinfo)
+    return bas <= simdi < bas + timedelta(days=1)
+
+
 def eczane(b: Baglam, slot: dict) -> Sonuc:
     ayar = b.cfg.get("eczane", {})
     liste = eczane_kaynak.getir(b.oturum, b.bugun, tuple(ayar.get("bolumler", ["merkez"])),
                                 ayar.get("yedek_ilceler"), log=b.log)
-    if liste.baslangic and liste.baslangic != b.bugun:
-        return Sonuc("tekrar", f"Liste henüz bugüne güncellenmemiş (liste tarihi {liste.baslangic}).")
-    yollar = render.nobetci_eczaneler(b.tema, eczane_kaynak.ilceye_gore(liste.eczaneler),
-                                      tarih_yazi(liste.baslangic or b.bugun), b.cikti)
+    if liste.baslangic and not nobet_gecerli_mi(liste.baslangic, b.simdi):
+        return Sonuc("tekrar", f"Liste henüz güncellenmemiş (nöbet başlangıcı {liste.baslangic}).")
+    alt_yazi = liste.pencere if liste.pencere and len(liste.pencere) <= 40 else tarih_yazi(liste.baslangic or b.bugun)
+    yollar = render.nobetci_eczaneler(b.tema, eczane_kaynak.ilceye_gore(liste.eczaneler), alt_yazi, b.cikti)
     medya, adresler = b.yayinla(yollar, "eczane")
     return Sonuc("paylasildi", f"{len(liste.eczaneler)} nöbetçi eczane ({liste.kaynak})", yollar, medya, adresler)
 
