@@ -125,11 +125,16 @@ def haber(b: Baglam, slot: dict) -> Sonuc:
             b.oturum, ajans_ayar["kaynaklar"], b.simdi, int(ajans_ayar.get("son_saat", 24)),
             int(ajans_ayar.get("en_fazla_makale", 6)), gorulen_linkler={g.get("url") for g in gecmis}, log=b.log,
         )[: int(ajans_ayar.get("en_fazla_aday", 25))]
-    h = haber_kaynak.haber_yaz(
-        b.oturum, os.environ.get("ANTHROPIC_API_KEY", ""), ayar.get("model", "claude-sonnet-5-5"), tur,
-        b.simdi, gecmis, editoryal=os.environ.get("EDITORIAL_GUIDE") or None,
-        en_fazla_arama=int(ayar.get("en_fazla_arama", 3)), adaylar=adaylar,
-    )
+    try:
+        h = haber_kaynak.haber_yaz(
+            b.oturum, os.environ.get("ANTHROPIC_API_KEY", ""), ayar.get("model", "claude-sonnet-5-5"), tur,
+            b.simdi, gecmis, editoryal=os.environ.get("EDITORIAL_GUIDE") or None,
+            en_fazla_arama=int(ayar.get("en_fazla_arama", 3)), adaylar=adaylar,
+        )
+    except haber_kaynak.HaberHatasi as e:
+        if "credit balance" in str(e).lower():           # bakiye yok: hata sayma, iş akışını kırmızıya boyama
+            return Sonuc("atlandi", "Claude API bakiyesi yetersiz (Claude Console'dan kredi yükleyin); haber atlandı.")
+        raise
     if h is None:
         return Sonuc("atlandi", "Uygun ve yeni bir haber bulunamadı.")
     return _haber_story(b, h, tur)
