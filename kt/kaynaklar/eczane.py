@@ -9,6 +9,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 from datetime import date
+from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
 
@@ -17,6 +18,9 @@ from ..tarih import gun_ay_coz
 
 RESMI_URL = "https://www.konyanobetcieczaneleri.com/"
 RESMI_AD = "5. Bölge Konya Eczacı Odası"
+# Sayfa, telefon/adres/tarif/ilçe bilgisini tarayıcıda bu adresten ayrıca yükler (sunucu HTML'inde boş gelir).
+VERI_YOLU = "/nobet/onyuz/veri.php"
+YUKLENIYOR = ("yükleniyor", "yukleniyor")
 YEDEK_URL = "https://www.posta.com.tr/nobetci-eczaneler/konya/"
 YEDEK_AD = "posta.com.tr (Konya Eczacı Odası verisi)"
 
@@ -76,7 +80,40 @@ PENCERE_RE = re.compile(
 )
 
 
-def resmi_coz(html: str, referans: date, bolumler: tuple[str, ...] | list[str] = ("merkez",)) -> NobetListesi:
+def _alan(art, ad: str) -> str | None:
+    """Kartın data-alan="..." öğesinin metni; öğe yoksa None. 'Yükleniyor…' yer tutucusu boş sayılır."""
+    el = art.find(attrs={"data-alan": ad})
+    if el is None:
+        return None
+    t = temiz(el.get_text(" "))
+    return "" if t.lower().startswith(YUKLENIYOR) else t
+
+
+def resmi_ayrintilar(oturum, html: str) -> dict:
+    """Sayfanın kendi betiğinin yaptığı gibi veri.php'den kart ayrıntılarını alır.
+
+    Dönen sözlük kart anahtarına (data-anahtar, ör. "m-32") göredir:
+    {"m-32": {"adres", "ilce", "tarif", "tel", "telLink", "lat", "lon", "placeId"}, ...}
+    """
+    soup = BeautifulSoup(html, "html.parser")
+    govde = soup.body
+    j = govde.get("data-j", "") if govde else ""
+    if not j:
+        raise RuntimeError("sayfada ayrıntı anahtarı (data-j) yok")
+    url = urljoin(RESMI_URL, govde.get("data-veri") or VERI_YOLU)
+    r = oturum.post(url, data={"j": j, "cf": "", "c": "masaustu", "t": "diger", "k": "normal"},
+                    headers={"Accept": "application/json", "Origin": RESMI_URL.rstrip("/"), "Referer": RESMI_URL},
+                    timeout=30)
+    r.raise_for_status()
+    veri = r.json()
+    if not isinstance(veri, dict) or not veri:
+        raise RuntimeError("ayrıntı verisi boş geldi")
+    return veri
+
+
+def resmi_coz(html: str, referans: date, bolumler: tuple[str, ...] | list[str] = ("merkez",),
+              ayrinti: dict | None = None) -> NobetListesi:
+    """ayrinti: resmi_ayrintilar() sonucu; verilirse telefon, adres, tarif ve gerçek ilçe oradan alınır."""
     soup = BeautifulSoup(html, "html.parser")
     pencere_yazi = ""
     for el in soup.find_all(["p", "span", "div"]):
@@ -91,6 +128,7 @@ def resmi_coz(html: str, referans: date, bolumler: tuple[str, ...] | list[str] =
         pencere = f"{m.group(1)} {m.group(2)} {m.group(3)} – {m.group(4)} {m.group(5)} {m.group(6)}"
 
     liste = NobetListesi(baslangic=baslangic, pencere=pencere, kaynak=RESMI_AD)
+    ayrinti = ayrinti or {}
     for bolum in bolumler:
         sec = soup.find("section", attrs={"data-bolum": bolum})
         if not sec:
@@ -102,24 +140,32 @@ def resmi_coz(html: str, referans: date, bolumler: tuple[str, ...] | list[str] =
                 continue
             if "eczane" not in ad.lower():
                 ad = f"{ad} Eczanesi"
+            bolge = temiz(art.get("data-bolge", ""))          # nöbet bölgesi, ör. "Karatay - Meram"
             kapsam_el = art.find("p", class_=lambda c: c and "uppercase" in c)
-            kapsam = temiz(kapsam_el.get_text(" ")) if kapsam_el else temiz(art.get("data-bolge", ""))
-            adres = tarif = ""
-            for p in art.find_all("p"):
-                if p is kapsam_el:
-                    continue
-                t = temiz(p.get_text(" "))
-                if not t:
-                    continue
-                siniflar = " ".join(p.get("class", []))
-                if "italic" in siniflar:
-                    tarif = tarif or t
-                else:
-                    adres = adres or t
-            liste.eczaneler.append(Eczane(
-                ad=ad, kapsam=kapsam, adres=adres, tarif=tarif,
-                tel=telefon_duzelt(art.get("data-tel", "")), ilce=temiz(art.get("data-bolge", "")),
-            ))
+            kapsam = temiz(kapsam_el.get_text(" ")) if kapsam_el else bolge
+            adres, tarif = _alan(art, "adres"), _alan(art, "tarif")
+            if adres is None and tarif is None:                # eski yapı: adres/tarif doğrudan <p> içinde
+                adres = tarif = ""
+                for p in art.find_all("p"):
+                    if p is kapsam_el:
+                        continue
+                    t = temiz(p.get_text(" "))
+                    if not t or t.lower().startswith(YUKLENIYOR):
+                        continue
+                    if "italic" in " ".join(p.get("class", [])):
+                        tarif = tarif or t
+                    else:
+                        adres = adres or t
+            tel = art.get("data-tel", "") or _alan(art, "tel-yazi") or ""
+            ilce = bolge if bolge and "-" not in bolge else ""   # tek ilçeli bölge = ilçe tahmini
+            v = ayrinti.get(art.get("data-anahtar", "")) or {}
+            if v:
+                adres = temiz(v.get("adres")) or adres
+                tarif = temiz(v.get("tarif")) or tarif
+                tel = v.get("tel") or v.get("telLink") or tel
+                ilce = temiz(v.get("ilce")) or ilce
+            liste.eczaneler.append(Eczane(ad=ad, kapsam=kapsam, adres=adres or "", tarif=tarif or "",
+                                          tel=telefon_duzelt(tel), ilce=ilce))
     return liste
 
 
@@ -154,16 +200,26 @@ def yedek_coz(html: str, ilceler: list[str] | None = None) -> NobetListesi:
 
 def getir(oturum, bugun: date, bolumler=("merkez",), yedek_ilceler=None, log=print) -> NobetListesi:
     hatalar = []
+    telefonsuz = None
     try:
         r = oturum.get(RESMI_URL, timeout=30)
         r.raise_for_status()
-        liste = resmi_coz(r.text, bugun, bolumler)
-        if liste.eczaneler:
+        try:
+            ayrinti = resmi_ayrintilar(oturum, r.text)
+        except Exception as e:  # noqa: BLE001
+            ayrinti = {}
+            hatalar.append(f"resmi site ayrıntıları (telefon/adres): {e}")
+        liste = resmi_coz(r.text, bugun, bolumler, ayrinti)
+        if liste.eczaneler and any(e.tel for e in liste.eczaneler):
             return liste
-        hatalar.append("resmi site: liste boş")
+        if liste.eczaneler:
+            telefonsuz = liste                       # isimler var ama telefonlar yok: önce yedeği dene
+            hatalar.append("resmi site: telefonlar alınamadı")
+        else:
+            hatalar.append("resmi site: liste boş")
     except Exception as e:  # noqa: BLE001
         hatalar.append(f"resmi site: {e}")
-    log("Eczacı Odası sitesi okunamadı, yedek kaynağa geçiliyor: " + "; ".join(hatalar))
+    log("Eczacı Odası sitesinden tam liste alınamadı, yedek kaynak deneniyor: " + "; ".join(hatalar))
     try:
         r = oturum.get(YEDEK_URL, timeout=30)
         r.raise_for_status()
@@ -173,4 +229,7 @@ def getir(oturum, bugun: date, bolumler=("merkez",), yedek_ilceler=None, log=pri
         hatalar.append("yedek: liste boş")
     except Exception as e:  # noqa: BLE001
         hatalar.append(f"yedek: {e}")
+    if telefonsuz:
+        log("Yedek kaynak da olmadı; Eczacı Odası listesi telefonsuz kullanılıyor.")
+        return telefonsuz
     raise RuntimeError("Nöbetçi eczane listesi alınamadı: " + "; ".join(hatalar))
