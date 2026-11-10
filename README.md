@@ -11,13 +11,13 @@ story atan sistem. GitHub'da ücretsiz çalışır, sunucu gerekmez. Paylaşım 
 | 08:00 | Günün Sözü | `data/sozler.json` (124 söz, her gün sıradaki) |
 | 08:45 | Nöbetçi eczaneler (Selçuklu · Meram · Karatay) | 5. Bölge Konya Eczacı Odası — konyanobetcieczaneleri.com (yedek: posta.com.tr) |
 | 09:30 | Haber (genel) | Yapay zekâ + web araması |
-| 11:00 | Vefat edenler (günde tek story) | Konya Büyükşehir — mezarlik.konya.bel.tr |
 | 11:30 | Haber (trafik / ulaşım) | Yapay zekâ + web araması |
 | 12:30 | Haber (Selçuklu Belediyesi) | Selçuklu Belediyesi haberleri |
 | 13:30 | Haber (Büyükşehir) | Yapay zekâ + web araması |
 | 15:30 | Haber (genel) | Yapay zekâ + web araması |
 | 17:30 | Haber (Konyaspor) | Yapay zekâ + web araması |
 | 19:30 | Haber (genel) | Yapay zekâ + web araması |
+| 23:50 | Vefat edenler (o günün tam listesi, günde tek story) | Konya Büyükşehir — mezarlik.konya.bel.tr |
 
 Günde yaklaşık 10–12 story. Saatler, türler ve ilçeler `config.yaml` dosyasından değiştirilir.
 
