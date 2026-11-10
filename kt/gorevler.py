@@ -66,7 +66,9 @@ def eczane(b: Baglam, slot: dict) -> Sonuc:
     alt_yazi = liste.pencere if liste.pencere and len(liste.pencere) <= 40 else tarih_yazi(liste.baslangic or b.bugun)
     yollar = render.nobetci_eczaneler(b.tema, eczane_kaynak.ilceye_gore(liste.eczaneler), alt_yazi, b.cikti)
     medya, adresler = b.yayinla(yollar, "eczane")
-    return Sonuc("paylasildi", f"{len(liste.eczaneler)} nöbetçi eczane ({liste.kaynak})", yollar, medya, adresler)
+    telefonlu = sum(1 for e in liste.eczaneler if e.tel)
+    return Sonuc("paylasildi", f"{len(liste.eczaneler)} nöbetçi eczane, tek story ({liste.kaynak}; "
+                               f"{telefonlu} telefonlu)", yollar, medya, adresler)
 
 
 def vefat(b: Baglam, slot: dict) -> Sonuc:
@@ -78,13 +80,16 @@ def vefat(b: Baglam, slot: dict) -> Sonuc:
     yeni = [k for k in bugunku if k.anahtar() not in paylasilan]
     if not yeni:
         return Sonuc("atlandi", f"Bugünkü {len(bugunku)} kaydın hepsi daha önce paylaşıldı.")
-    yollar = render.vefat_edenler(b.tema, [k.story() for k in yeni], tarih_yazi(b.bugun),
-                                  b.cikti, en_fazla=int(b.cfg.get("vefat", {}).get("sayfa_basina", 15)),
+    # Liste her zaman tek story'dir (render gerekirse küçültür / iki sütuna geçer).
+    yollar = render.vefat_edenler(b.tema, [k.story() for k in yeni], tarih_yazi(b.bugun), b.cikti,
                                   dosya_on_ek=f"vefat-{b.simdi:%H%M}")
+    *_, kapasite = render.vefat_duzeni(len(yeni))
+    gosterilen = yeni if len(yeni) <= kapasite else yeni[:max(0, kapasite - 1)]   # aşırı kalabalıkta "+N kişi daha"
     medya, adresler = b.yayinla(yollar, "vefat")
     if not b.deneme:
-        b.durum.vefat_ekle(b.bugun, [k.anahtar() for k in yeni])
-    return Sonuc("paylasildi", f"{len(yeni)} vefat kaydı", yollar, medya, adresler)
+        b.durum.vefat_ekle(b.bugun, [k.anahtar() for k in gosterilen])           # kalanlar sonraki story'de
+    ek = f" ({len(yeni) - len(gosterilen)} kişi sonraki story'ye kaldı)" if len(gosterilen) < len(yeni) else ""
+    return Sonuc("paylasildi", f"{len(gosterilen)} vefat kaydı, tek story{ek}", yollar, medya, adresler)
 
 
 def haber(b: Baglam, slot: dict) -> Sonuc:

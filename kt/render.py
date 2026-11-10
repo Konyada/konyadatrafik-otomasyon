@@ -162,8 +162,9 @@ def logo_yapistir(img: Image.Image, tema: Tema, x: int, y: int, cap: int) -> Non
     ciz.text((x + cap / 2, y + cap / 2), "KT", font=font("black", cap // 3), fill=(255, 255, 255), anchor="mm")
 
 
-def _isiltili_zemin(tema: Tema, merkez=(540, 195), yaricap: int = 360) -> Image.Image:
+def _isiltili_zemin(tema: Tema, kompakt: bool = False) -> Image.Image:
     """Üstten alta koyu yeşil geçiş + logonun arkasında yumuşak yeşil ışıltı."""
+    merkez, yaricap = ((540, 155), 290) if kompakt else ((540, 195), 360)
     return _zemin_hazirla(tema.zemin_ust, tema.zemin_alt, tema.isilti, merkez, yaricap).copy()
 
 
@@ -183,17 +184,28 @@ def _zemin_hazirla(zemin_ust, zemin_alt, isilti, merkez, yaricap) -> Image.Image
     return zemin.resize((W, H), Image.BICUBIC).convert("RGBA")
 
 
+LISTE_Y0, KOMPAKT_Y0 = 590, 455      # liste kartının başladığı y (normal / kalabalık günler için kompakt başlık)
+
+
 def _liste_basligi(img: Image.Image, tema: Tema, baslik: str, tarih_yazisi: str,
-                   ust_yazi: str = "KONYA'DA BUGÜN") -> int:
+                   ust_yazi: str = "KONYA'DA BUGÜN", kompakt: bool = False) -> int:
     """Ortada logo + üst başlık + büyük başlık + tarih + yeşil çizgi. Kartın başlayacağı y'yi döndürür."""
-    logo_yapistir(img, tema, (W - 230) // 2, 80, 230)
     ciz = ImageDraw.Draw(img)
+    if kompakt:                                   # aynı düzen, daha küçük logo ve yazılar
+        logo_yapistir(img, tema, (W - 150) // 2, 80, 150)
+        _ortala(ciz, 282, ust_yazi, font("semibold", 30), tema.acik_yesil)
+        f, _ = sigdir(tr_buyuk(baslik), "bold", 68, 48, W - 2 * 70, 1)
+        _ortala(ciz, 356, tr_buyuk(baslik), f, tema.beyaz)
+        _ortala(ciz, 404, tarih_yazisi, font("regular", 30), tema.soluk)
+        ciz.rounded_rectangle((W / 2 - 60, 424, W / 2 + 60, 430), radius=3, fill=tema.yesil)
+        return KOMPAKT_Y0
+    logo_yapistir(img, tema, (W - 230) // 2, 80, 230)
     _ortala(ciz, 380, ust_yazi, font("semibold", 34), tema.acik_yesil)
     f, _ = sigdir(tr_buyuk(baslik), "bold", 84, 56, W - 2 * 70, 1)
     _ortala(ciz, 470, tr_buyuk(baslik), f, tema.beyaz)
     _ortala(ciz, 529, tarih_yazisi, font("regular", 34), tema.soluk)
     ciz.rounded_rectangle((W / 2 - 70, 552, W / 2 + 70, 558), radius=3, fill=tema.yesil)
-    return 590
+    return LISTE_Y0
 
 
 def _kart(img: Image.Image, tema: Tema, y1: int, y2: int) -> ImageDraw.ImageDraw:
@@ -217,99 +229,240 @@ def _dilek_yuksekligi(satir_sayisi: int) -> int:
 
 
 # --------------------------------------------------------------------------- vefat
-VEFAT_SATIR = 64
+# Liste her zaman TEK story'dir: kayıt sayısı arttıkça satırlar küçülür, gerekirse iki sütuna geçilir.
+VEFAT_DILEK = ["Allah rahmet eylesin,", "mekânları cennet olsun."]
+VEFAT_UST, VEFAT_ALT = 10, 23                 # kart içi üst / alt boşluk
+
+
+def _vefat_adaylari():
+    """Büyükten küçüğe denenecek düzenler: (kompakt başlık, sütun, satır yüksekliği)."""
+    for satir in range(64, 49, -2):           # tek sütun, şablondaki boyuttan başlayarak
+        yield False, 1, satir
+    for satir in range(64, 53, -2):           # iki sütun (ad üstte, mezarlık altta)
+        yield False, 2, satir
+    for satir in range(58, 45, -2):           # iki sütun + küçük başlık (çok kalabalık günler)
+        yield True, 2, satir
+
+
+def vefat_duzeni(adet: int) -> tuple[bool, int, int, int]:
+    """(kompakt, sütun, satır yüksekliği, kapasite): bütün kayıtları tek sayfaya sığdıran en büyük düzen.
+    Hiçbiri yetmezse en küçük düzen döner; sığmayanlar son hücrede "+N kişi daha" olarak yazılır."""
+    sinir = DIPNOT_TABAN - 40 - _dilek_yuksekligi(len(VEFAT_DILEK))      # kartın inebileceği en alt nokta
+    duzen = (False, 1, 64, 0)
+    for kompakt, sutun, satir in _vefat_adaylari():
+        y0 = KOMPAKT_Y0 if kompakt else LISTE_Y0
+        kapasite = sutun * ((sinir - y0 - VEFAT_UST - VEFAT_ALT) // satir)
+        duzen = (kompakt, sutun, satir, kapasite)
+        if adet <= kapasite:
+            break
+    return duzen
 
 
 def vefat_edenler(tema: Tema, kayitlar: list[dict], tarih_yazisi: str, cikti: Path,
-                  en_fazla: int = 15, dosya_on_ek: str = "vefat") -> list[Path]:
-    """kayitlar: [{ad, defin}] — ad 'Hatice Muratoğlu', defin 'Seyit Şahin (Kurtuluş)'."""
-    dilek = ["Allah rahmet eylesin,", "mekânları cennet olsun."]
-    sinir = DIPNOT_TABAN - 40 - _dilek_yuksekligi(len(dilek))      # kartın inebileceği en alt nokta
-    sigan = max(1, min(en_fazla, (sinir - 23 - 600) // VEFAT_SATIR))
-    sayfalar = [kayitlar[i:i + sigan] for i in range(0, len(kayitlar), sigan)] or [[]]
-    f_ad, f_yer = font("semibold", 36), font("regular", 29)
-    yollar = []
-    for no, sayfa in enumerate(sayfalar, 1):
-        img = _isiltili_zemin(tema)
-        tarih = tarih_yazisi + (f" · {no}/{len(sayfalar)}" if len(sayfalar) > 1 else "")
-        y0 = _liste_basligi(img, tema, "Vefat Edenler", tarih)
-        kart_alt = 600 + len(sayfa) * VEFAT_SATIR + 23
-        ciz = _kart(img, tema, y0, kart_alt)
-        for i, k in enumerate(sayfa):
-            ust = 600 + i * VEFAT_SATIR
-            if i % 2 == 1:
-                ciz.rectangle((KART_X1, ust, KART_X2, ust + VEFAT_SATIR), fill=tema.kart_alt)
-            yer = k.get("defin", "")
-            yer_gen = min(genislik(yer, f_yer), 380)
-            yer = kisalt(yer, f_yer, 380)
-            ciz.text((IC_X2, ust + 44), yer, font=f_yer, fill=tema.mezarlik, anchor="rs")
-            ad = kisalt(k.get("ad", ""), f_ad, IC_X2 - IC_X1 - yer_gen - 24)
-            ciz.text((IC_X1, ust + 44), ad, font=f_ad, fill=tema.koyu_metin, anchor="ls")
-        _alt_yazilar(img, tema, kart_alt, dilek, "Kaynak: Konya Büyükşehir Belediyesi Mezarlık Bilgi Sistemi")
-        yollar.append(_kaydet(img, cikti / f"{dosya_on_ek}-{no}.jpg", tema.jpeg_kalite))
-    return yollar
+                  dosya_on_ek: str = "vefat") -> list[Path]:
+    """kayitlar: [{ad, defin}] — ad 'Hatice Muratoğlu', defin 'Seyit Şahin (Kurtuluş)'. Tek görsel üretir."""
+    kompakt, sutun, satir, kapasite = vefat_duzeni(len(kayitlar))
+    gosterilen, tasan = list(kayitlar), 0
+    if len(gosterilen) > kapasite:
+        gosterilen = gosterilen[:max(0, kapasite - 1)]
+        tasan = len(kayitlar) - len(gosterilen)
+    hucre = len(gosterilen) + (1 if tasan else 0)
+    satir_sayisi = max(1, math.ceil(hucre / sutun))
+
+    img = _isiltili_zemin(tema, kompakt)
+    y0 = _liste_basligi(img, tema, "Vefat Edenler", tarih_yazisi, kompakt=kompakt)
+    ust0 = y0 + VEFAT_UST
+    kart_alt = ust0 + satir_sayisi * satir + VEFAT_ALT
+    ciz = _kart(img, tema, y0, kart_alt)
+    for r in range(1, satir_sayisi, 2):                       # şablondaki gibi açık yeşil ara satırlar
+        ciz.rectangle((KART_X1, ust0 + r * satir, KART_X2, ust0 + (r + 1) * satir), fill=tema.kart_alt)
+
+    if sutun == 1:
+        f_ad, f_yer = font("semibold", round(36 * satir / 64)), font("regular", round(29 * satir / 64))
+        taban = round(44 * satir / 64)
+        for i, k in enumerate(gosterilen):
+            ust = ust0 + i * satir
+            yer = kisalt(k.get("defin", ""), f_yer, 380)
+            ciz.text((IC_X2, ust + taban), yer, font=f_yer, fill=tema.mezarlik, anchor="rs")
+            ad = kisalt(k.get("ad", ""), f_ad, IC_X2 - IC_X1 - genislik(yer, f_yer) - 24)
+            ciz.text((IC_X1, ust + taban), ad, font=f_ad, fill=tema.koyu_metin, anchor="ls")
+    else:
+        aralik = 40
+        sutun_gen = (IC_X2 - IC_X1 - aralik) / 2
+        f_ad, f_yer = font("semibold", round(0.43 * satir)), font("regular", round(0.33 * satir))
+        t_ad, t_yer = round(0.42 * satir), round(0.84 * satir)
+        orta = (IC_X1 + IC_X2) / 2
+        ciz.line((orta, ust0 + 10, orta, ust0 + satir_sayisi * satir - 10), fill=tema.ayrac, width=2)
+
+        def hucre_yaz(sira: int, ust_yazi: str, alt_yazi: str, renk) -> None:
+            s_no, r = divmod(sira, satir_sayisi)                # önce sol sütun dolar
+            x, ust = IC_X1 + s_no * (sutun_gen + aralik), ust0 + r * satir
+            ciz.text((x, ust + t_ad), kisalt(ust_yazi, f_ad, sutun_gen), font=f_ad, fill=renk, anchor="ls")
+            ciz.text((x, ust + t_yer), kisalt(alt_yazi, f_yer, sutun_gen), font=f_yer, fill=tema.mezarlik,
+                     anchor="ls")
+
+        for i, k in enumerate(gosterilen):
+            hucre_yaz(i, k.get("ad", ""), k.get("defin", ""), tema.koyu_metin)
+        if tasan:
+            hucre_yaz(len(gosterilen), f"+{tasan} kişi daha", "mezarlik.konya.bel.tr", tema.yesil)
+
+    _alt_yazilar(img, tema, kart_alt, VEFAT_DILEK, "Kaynak: Konya Büyükşehir Belediyesi Mezarlık Bilgi Sistemi")
+    return [_kaydet(img, cikti / f"{dosya_on_ek}.jpg", tema.jpeg_kalite)]
 
 
 # --------------------------------------------------------------------------- nöbetçi eczane
-ECZ_BOLUM, ECZ_SATIR = 44, 75
+# Liste her zaman TEK story'dir: eczane sayısı arttıkça satırlar küçülür; çok kalabalıkta tarif satırı
+# düşer, en son iki sütuna geçilir.
+ECZ_DILEK = ["Geçmiş olsun, sağlıklı günler."]
+ECZ_DIPNOT = "Nöbet listesi değişebilir, gitmeden önce telefonla teyit edin."
+ECZ_UST, ECZ_ALT, ECZ_ARA = 20, 20, 10        # kart içi üst / alt boşluk, ilçeler arası boşluk
+
+
+@dataclass(frozen=True)
+class EczDuzen:
+    kompakt: bool        # küçük başlık
+    sutun: int           # 1 veya 2
+    tip: str             # "tarifli": ad + tel / tarif · "tek": ad + tel · "cift": ad / tel (iki sütunda)
+    satir: int           # eczane satırı yüksekliği
+    bolum: int           # ilçe başlığı (yeşil bant) yüksekliği
+
+
+def _ecz_adaylari():
+    for satir in range(75, 61, -1):
+        yield EczDuzen(False, 1, "tarifli", satir, 44)       # şablondaki boyuttan başlayarak
+    for satir in range(75, 61, -1):
+        yield EczDuzen(True, 1, "tarifli", satir, 44)
+    for satir in range(52, 39, -2):
+        yield EczDuzen(True, 1, "tek", satir, 40)
+    for satir in range(62, 45, -2):
+        yield EczDuzen(True, 2, "cift", satir, 38)
+
+
+def _ecz_ogeler(gruplar: list[tuple[str, list[dict]]]) -> list[tuple[str, object]]:
+    ogeler: list[tuple[str, object]] = []
+    for ilce, eczaneler in gruplar:
+        if eczaneler:
+            ogeler.append(("bolum", ilce))
+            ogeler.extend(("eczane", e) for e in eczaneler)
+    return ogeler
+
+
+def _sutun_yuksekligi(ogeler: list[tuple[str, object]], d: EczDuzen) -> int:
+    y = 0
+    for i, (tur, _) in enumerate(ogeler):
+        if tur == "bolum":
+            y += (ECZ_ARA if i else 0) + d.bolum
+        else:
+            y += d.satir
+    return y
+
+
+def _sutunlara_bol(ogeler: list[tuple[str, object]], d: EczDuzen) -> list[list[tuple[str, object]]]:
+    if d.sutun == 1 or len(ogeler) < 2:
+        return [ogeler]
+    en_iyi = None
+    for k in range(1, len(ogeler)):
+        sol, sag = ogeler[:k], ogeler[k:]
+        if sol[-1][0] == "bolum":                 # sütun ilçe başlığıyla bitmesin
+            continue
+        if sag[0][0] != "bolum":                  # ilçe ikinci sütuna taşıyorsa başlığı tekrarla
+            onceki = next(o[1] for o in reversed(sol) if o[0] == "bolum")
+            sag = [("bolum", f"{onceki} (devam)")] + sag
+        yuk = max(_sutun_yuksekligi(sol, d), _sutun_yuksekligi(sag, d))
+        if en_iyi is None or yuk < en_iyi[0]:
+            en_iyi = (yuk, [sol, sag])
+    return en_iyi[1] if en_iyi else [ogeler]
+
+
+def eczane_duzeni(gruplar: list[tuple[str, list[dict]]]) -> tuple[EczDuzen, list[list[tuple[str, object]]], int]:
+    """(düzen, sütunlar, sığmayan eczane sayısı): bütün listeyi tek sayfaya sığdıran en büyük düzen."""
+    sinir = DIPNOT_TABAN - 40 - _dilek_yuksekligi(len(ECZ_DILEK))
+    ogeler = _ecz_ogeler(gruplar)
+
+    def sigar(d, sutunlar):
+        y0 = KOMPAKT_Y0 if d.kompakt else LISTE_Y0
+        return y0 + ECZ_UST + max(_sutun_yuksekligi(s, d) for s in sutunlar) + ECZ_ALT <= sinir
+
+    d = None
+    for d in _ecz_adaylari():
+        sutunlar = _sutunlara_bol(ogeler, d)
+        if sigar(d, sutunlar):
+            return d, sutunlar, 0
+    # Hiçbir düzen yetmedi (çok olağan dışı): sondan eczane eksilt, son satıra "+N eczane daha" yaz.
+    toplam = sum(1 for t, _ in ogeler if t == "eczane")
+    while ogeler:
+        ogeler = ogeler[:-1]
+        while ogeler and ogeler[-1][0] == "bolum":
+            ogeler = ogeler[:-1]
+        tasan = toplam - sum(1 for t, _ in ogeler if t == "eczane")
+        aday = ogeler + [("not", f"+{tasan} eczane daha · konyanobetcieczaneleri.com")]
+        sutunlar = _sutunlara_bol(aday, d)
+        if sigar(d, sutunlar):
+            return d, sutunlar, tasan
+    return d, [[]], toplam
 
 
 def nobetci_eczaneler(tema: Tema, gruplar: list[tuple[str, list[dict]]], tarih_yazisi: str,
                       cikti: Path) -> list[Path]:
-    """gruplar: [("Selçuklu", [{ad, tel, tarif}]), ...]"""
-    dilek = ["Geçmiş olsun, sağlıklı günler."]
-    sinir = DIPNOT_TABAN - 40 - _dilek_yuksekligi(len(dilek))
-    # öğeleri sayfalara böl (bölüm başlığı + satırlar), taşan bölüm yeni sayfada "(devam)" ile sürer
-    sayfalar: list[list[tuple[str, list[dict]]]] = []
-    mevcut: list[tuple[str, list[dict]]] = []
-    y = 590 + 20
-    for ilce, eczaneler in gruplar:
-        kalan = list(eczaneler)
-        baslik = ilce
-        while kalan:
-            # bölüm başlığı + en az bir satır sığmalı
-            if y + ECZ_BOLUM + ECZ_SATIR + 20 > sinir and mevcut:
-                sayfalar.append(mevcut)
-                mevcut, y = [], 590 + 20
-            y += ECZ_BOLUM
-            sigan = max(1, (sinir - 20 - y) // ECZ_SATIR)
-            parca, kalan = kalan[:sigan], kalan[sigan:]
-            mevcut.append((baslik, parca))
-            y += len(parca) * ECZ_SATIR + 10
-            baslik = f"{ilce} (devam)"
-    if mevcut:
-        sayfalar.append(mevcut)
+    """gruplar: [("Selçuklu", [{ad, tel, tarif}]), ...] — tek görsel üretir."""
+    d, sutunlar, _ = eczane_duzeni(gruplar)
+    img = _isiltili_zemin(tema, d.kompakt)
+    y0 = _liste_basligi(img, tema, "Nöbetçi Eczaneler", tarih_yazisi, kompakt=d.kompakt)
+    kart_alt = y0 + ECZ_UST + max([_sutun_yuksekligi(s, d) for s in sutunlar] + [0]) + ECZ_ALT
+    ciz = _kart(img, tema, y0, kart_alt)
 
-    f_bolum, f_ad, f_tel, f_tarif = font("bold", 26), font("semibold", 30), font("bold", 26), font("regular", 23)
-    yollar = []
-    for no, sayfa in enumerate(sayfalar or [[]], 1):
-        img = _isiltili_zemin(tema)
-        tarih = tarih_yazisi + (f" · {no}/{len(sayfalar)}" if len(sayfalar) > 1 else "")
-        y0 = _liste_basligi(img, tema, "Nöbetçi Eczaneler", tarih)
-        # kart yüksekliği
-        yuk = 20 + sum(ECZ_BOLUM + len(p) * ECZ_SATIR + 10 for _, p in sayfa) - 10 + 13 + 7
-        kart_alt = y0 + yuk
-        ciz = _kart(img, tema, y0, kart_alt)
-        y = y0 + 20
-        for ilce, eczaneler in sayfa:
-            ciz.rectangle((KART_X1, y, KART_X2, y + ECZ_BOLUM), fill=tema.yesil)
-            ciz.text((IC_X1, y + ECZ_BOLUM / 2 + 1), tr_buyuk(ilce), font=f_bolum, fill=(255, 255, 255), anchor="lm")
-            y += ECZ_BOLUM
-            for e in eczaneler:
+    o = d.satir / 75
+    if d.tip == "tarifli":
+        f_ad, f_tel, f_tarif = font("semibold", round(30 * o)), font("bold", round(26 * o)), font("regular", round(23 * o))
+        t_ad, t_alt, ayrac_y = round(38 * o), round(70 * o), round(7 * o)
+    elif d.tip == "tek":
+        f_ad, f_tel, f_tarif = font("semibold", min(30, round(0.6 * d.satir))), font("bold", min(26, round(0.52 * d.satir))), None
+        t_ad, t_alt, ayrac_y = round(0.64 * d.satir), 0, 2
+    else:
+        f_ad, f_tel, f_tarif = font("semibold", round(0.43 * d.satir)), font("bold", round(0.34 * d.satir)), None
+        t_ad, t_alt, ayrac_y = round(0.42 * d.satir), round(0.86 * d.satir), 2
+    f_bolum = font("bold", round(26 * d.bolum / 44))
+
+    if d.sutun == 1:
+        bantlar = [(KART_X1, KART_X2)]
+    else:
+        bantlar = [(KART_X1, W / 2 - 6), (W / 2 + 6, KART_X2)]
+    for (b1, b2), sutun in zip(bantlar, sutunlar):
+        x1, x2 = (IC_X1, IC_X2) if d.sutun == 1 else (b1 + 30, b2 - 30)
+        y = y0 + ECZ_UST
+        onceki = None
+        for i, (tur, deger) in enumerate(sutun):
+            if tur == "bolum":
+                y += ECZ_ARA if i else 0
+                ciz.rectangle((b1, y, b2, y + d.bolum), fill=tema.yesil)
+                ciz.text((x1, y + d.bolum / 2 + 1), tr_buyuk(str(deger)), font=f_bolum, fill=(255, 255, 255), anchor="lm")
+                y += d.bolum
+            elif tur == "not":
+                ciz.text((x1, y + t_ad), kisalt(str(deger), f_ad, x2 - x1), font=f_ad, fill=tema.yesil, anchor="ls")
+                y += d.satir
+            else:
+                e = deger
+                if onceki == "eczane":
+                    ciz.line((x1, y + ayrac_y, x2, y + ayrac_y), fill=tema.ayrac, width=2)
                 tel = e.get("tel", "")
-                tel_gen = genislik(tel, f_tel) if tel else 0
-                ciz.text((IC_X1, y + 38), kisalt(e.get("ad", ""), f_ad, IC_X2 - IC_X1 - tel_gen - 24),
-                         font=f_ad, fill=tema.koyu_metin, anchor="ls")
-                if tel:
-                    ciz.text((IC_X2, y + 38), tel, font=f_tel, fill=tema.telefon, anchor="rs")
-                ciz.text((IC_X1, y + 70), kisalt(e.get("tarif", ""), f_tarif, IC_X2 - IC_X1),
-                         font=f_tarif, fill=tema.tarif, anchor="ls")
-                ciz.line((IC_X1, y + 82, IC_X2, y + 82), fill=tema.ayrac, width=2)
-                y += ECZ_SATIR
-            y += 10
-        _alt_yazilar(img, tema, kart_alt, dilek, "Nöbet listesi değişebilir, gitmeden önce telefonla teyit edin.")
-        yollar.append(_kaydet(img, cikti / f"nobetci-eczane-{no}.jpg", tema.jpeg_kalite))
-    return yollar
+                if d.tip == "cift":
+                    ciz.text((x1, y + t_ad), kisalt(e.get("ad", ""), f_ad, x2 - x1), font=f_ad,
+                             fill=tema.koyu_metin, anchor="ls")
+                    if tel:
+                        ciz.text((x1, y + t_alt), tel, font=f_tel, fill=tema.telefon, anchor="ls")
+                else:
+                    tel_gen = genislik(tel, f_tel) if tel else 0
+                    ciz.text((x1, y + t_ad), kisalt(e.get("ad", ""), f_ad, x2 - x1 - tel_gen - 24), font=f_ad,
+                             fill=tema.koyu_metin, anchor="ls")
+                    if tel:
+                        ciz.text((x2, y + t_ad), tel, font=f_tel, fill=tema.telefon, anchor="rs")
+                    if f_tarif is not None and e.get("tarif"):
+                        ciz.text((x1, y + t_alt), kisalt(e.get("tarif", ""), f_tarif, x2 - x1), font=f_tarif,
+                                 fill=tema.tarif, anchor="ls")
+                y += d.satir
+            onceki = tur
+    _alt_yazilar(img, tema, kart_alt, ECZ_DILEK, ECZ_DIPNOT)
+    return [_kaydet(img, cikti / "nobetci-eczane.jpg", tema.jpeg_kalite)]
 
 
 # --------------------------------------------------------------------------- günün sözü
