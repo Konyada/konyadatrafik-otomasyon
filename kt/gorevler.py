@@ -82,23 +82,29 @@ def eczane(b: Baglam, slot: dict) -> Sonuc:
 
 def vefat(b: Baglam, slot: dict) -> Sonuc:
     kayitlar = vefat_kaynak.getir(b.oturum)
-    bugunku = vefat_kaynak.gune_gore(kayitlar, b.bugun)
-    if not bugunku:
-        return Sonuc("tekrar", "Bugün için henüz vefat kaydı girilmemiş.")
-    paylasilan = b.durum.vefat_paylasilan(b.bugun)
-    yeni = [k for k in bugunku if k.anahtar() not in paylasilan]
+    gun = slot.get("gun") or b.bugun                 # zamanlanmış görev: görevin ait olduğu gün
+    if slot.get("elle"):                              # elle çalıştırma: sitedeki en güncel günün listesi
+        tarihler = sorted({k.defin_tarihi for k in kayitlar if k.defin_tarihi and k.defin_tarihi <= b.bugun})
+        if tarihler:
+            gun = tarihler[-1]
+    gunun = vefat_kaynak.gune_gore(kayitlar, gun)
+    if not gunun:
+        return Sonuc("tekrar", f"{tarih_yazi(gun)} için henüz vefat kaydı girilmemiş.")
+    paylasilan = b.durum.vefat_paylasilan(gun)
+    yeni = [k for k in gunun if k.anahtar() not in paylasilan]
     if not yeni:
-        return Sonuc("atlandi", f"Bugünkü {len(bugunku)} kaydın hepsi daha önce paylaşıldı.")
+        return Sonuc("atlandi", f"{tarih_yazi(gun)} listesindeki {len(gunun)} kaydın hepsi daha önce paylaşıldı.")
     # Liste her zaman tek story'dir (render gerekirse küçültür / iki sütuna geçer).
-    yollar = render.vefat_edenler(b.tema, [k.story() for k in yeni], tarih_yazi(b.bugun), b.cikti,
+    yollar = render.vefat_edenler(b.tema, [k.story() for k in yeni], tarih_yazi(gun), b.cikti,
                                   dosya_on_ek=f"vefat-{b.simdi:%H%M}")
     *_, kapasite = render.vefat_duzeni(len(yeni))
     gosterilen = yeni if len(yeni) <= kapasite else yeni[:max(0, kapasite - 1)]   # aşırı kalabalıkta "+N kişi daha"
     medya, adresler = b.yayinla(yollar, "vefat")
     if not b.deneme:
-        b.durum.vefat_ekle(b.bugun, [k.anahtar() for k in gosterilen])           # kalanlar sonraki story'de
+        b.durum.vefat_ekle(gun, [k.anahtar() for k in gosterilen])               # kalanlar sonraki story'de
     ek = f" ({len(yeni) - len(gosterilen)} kişi sonraki story'ye kaldı)" if len(gosterilen) < len(yeni) else ""
-    return Sonuc("paylasildi", f"{len(gosterilen)} vefat kaydı, tek story{ek}", yollar, medya, adresler)
+    return Sonuc("paylasildi", f"{tarih_yazi(gun)}: {len(gosterilen)} vefat kaydı, tek story{ek}",
+                 yollar, medya, adresler)
 
 
 ORNEK_HABER = KOK / "data" / "ornek_haber.json"

@@ -39,15 +39,18 @@ def slot_kimligi(slot: dict) -> str:
 
 
 def zamani_gelenler(zamanlama: list[dict], simdi, durum: Durum, tolerans_dk: int) -> list[dict]:
+    """Saati gelmiş, henüz yapılmamış görevler. Her görev ait olduğu günü 'gun' alanında taşır;
+    gece yarısına yakın bir görev (ör. 23:50) GitHub gecikmesiyle ertesi gün çalışsa da kendi gününe sayılır."""
     gelen = []
     for slot in sorted(zamanlama, key=lambda s: s["saat"]):
         ss, dd = (int(x) for x in slot["saat"].split(":"))
-        vakit = simdi.replace(hour=ss, minute=dd, second=0, microsecond=0)
-        if simdi < vakit or simdi - vakit > timedelta(minutes=tolerans_dk):
-            continue
-        if durum.slot(simdi.date(), slot_kimligi(slot)).get("durum") in KALICI:
-            continue
-        gelen.append(slot)
+        bugun_vakit = simdi.replace(hour=ss, minute=dd, second=0, microsecond=0)
+        for vakit in (bugun_vakit - timedelta(days=1), bugun_vakit):
+            if simdi < vakit or simdi - vakit > timedelta(minutes=tolerans_dk):
+                continue
+            if durum.slot(vakit.date(), slot_kimligi(slot)).get("durum") in KALICI:
+                continue
+            gelen.append({**slot, "gun": vakit.date()})
     return gelen
 
 
@@ -168,13 +171,14 @@ def calistir() -> int:
             print(f"  görsel: {a}")
 
         if not deneme and not slot.get("elle"):
-            onceki = durum.slot(simdi.date(), sid)
+            gun = slot.get("gun") or simdi.date()
+            onceki = durum.slot(gun, sid)
             kayit_durum = sonuc.durum
             if sonuc.durum == "hata":
                 sayi = int(onceki.get("hata_sayisi", 0)) + 1
                 kayit_durum = "hata_kalici" if sayi >= EN_FAZLA_HATA else "hata"
-                durum.slot_kaydet(simdi.date(), sid, hata_sayisi=sayi)
-            durum.slot_kaydet(simdi.date(), sid, durum=kayit_durum, mesaj=sonuc.mesaj[:300], medya=sonuc.medya)
+                durum.slot_kaydet(gun, sid, hata_sayisi=sayi)
+            durum.slot_kaydet(gun, sid, durum=kayit_durum, mesaj=sonuc.mesaj[:300], medya=sonuc.medya)
         if sonuc.durum == "hata":
             hata_var = True
         gorsel = " ".join(f"[görsel {i}]({a})" for i, a in enumerate(sonuc.adresler, 1) if a.startswith("http"))
