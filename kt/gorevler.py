@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
@@ -9,6 +10,7 @@ from pathlib import Path
 from typing import Callable
 
 from . import gorsel_kaynak, render
+from .config import KOK
 from .durum import Durum
 from .kaynaklar import ajans as ajans_kaynak
 from .kaynaklar import eczane as eczane_kaynak
@@ -99,12 +101,23 @@ def vefat(b: Baglam, slot: dict) -> Sonuc:
     return Sonuc("paylasildi", f"{len(gosterilen)} vefat kaydı, tek story{ek}", yollar, medya, adresler)
 
 
+ORNEK_HABER = KOK / "data" / "ornek_haber.json"
+
+
 def haber(b: Baglam, slot: dict) -> Sonuc:
-    if not os.environ.get("ANTHROPIC_API_KEY"):
+    # Örnek haber: yalnızca ELLE başlatılan DENEME çalıştırmasında, tasarımı görmek için kullanılır.
+    # Zamanlanmış görevler ve gerçek paylaşımlar bu dosyaya hiç bakmaz.
+    ornek = None
+    if b.deneme and slot.get("elle") and ORNEK_HABER.exists():
+        ornek = json.loads(ORNEK_HABER.read_text(encoding="utf-8"))
+        b.log("  Deneme: data/ornek_haber.json'daki örnek haber kullanılıyor (yapay zekâ çağrılmadı).")
+    if ornek is None and not os.environ.get("ANTHROPIC_API_KEY"):
         return Sonuc("atlandi", "Claude API anahtarı (ANTHROPIC_API_KEY) tanımlı değil; haber atlandı.")
     ayar = b.cfg.get("haber", {})
     tur = slot.get("tur", "genel")
     gecmis = b.durum.haber_gecmisi(int(ayar.get("gecmis_gun", 5)), b.bugun)
+    if ornek is not None:
+        return _haber_story(b, ornek, tur)
     ajans_ayar = b.cfg.get("ajans") or {}
     adaylar = []
     if ajans_ayar.get("kaynaklar"):
@@ -119,6 +132,10 @@ def haber(b: Baglam, slot: dict) -> Sonuc:
     )
     if h is None:
         return Sonuc("atlandi", "Uygun ve yeni bir haber bulunamadı.")
+    return _haber_story(b, h, tur)
+
+
+def _haber_story(b: Baglam, h: dict, tur: str) -> Sonuc:
     foto, foto_notu = gorsel_kaynak.foto_bul(h, b.cfg, b.oturum, b.cikti, log=b.log)
     yollar = render.haber(b.tema, h["konum"], h["kategori"], h["baslik"], h["etiketler"], h["metin"],
                           h["kapanis"], tarih_yazi(b.bugun, gun_adi=False), b.cikti, foto=foto,
