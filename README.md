@@ -26,8 +26,9 @@ Tasarımlar Konya'da Trafik'in kendi şablonlarıyla aynıdır: vefat ve nöbet�
 zeminde ortada logo, "KONYA'DA BUGÜN" başlığı ve beyaz liste kartı; haber için üstte fotoğraf,
 kırmızı ilçe ve yeşil kategori etiketi, başlık, kısa bilgi etiketleri, metin ve kapanış cümlesi.
 Vefat ve nöbetçi eczane listeleri her zaman **tek story** olarak paylaşılır: liste uzadıkça satırlar
-otomatik küçülür, çok kalabalık günlerde iki sütuna geçilir. Eczanelerin telefon, adres ve ilçe
-bilgisi Eczacı Odası sitesinin kendi veri adresinden (veri.php) alınır.
+otomatik küçülür, çok kalabalık günlerde iki sütuna geçilir. Nöbetçi eczane listesi Eczacı Odası
+sitesinden alınır; Oda sitesi telefonları otomatik erişime kapattığı için telefon, adres ve ilçe aynı Oda
+verisini yayınlayan posta.com.tr listesinden eczane adıyla eşleştirilerek eklenir.
 
 **Nasıl çalışır?** GitHub sistemi gündüz her 15 dakikada bir uyandırır. Sistem saati gelmiş ama
 henüz yapılmamış görevi çalıştırır: veriyi çeker, yeşil şablonla 1080x1920 story görselini üretir,
