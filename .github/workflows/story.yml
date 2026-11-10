@@ -1,0 +1,62 @@
+name: Konya'da Trafik story
+
+on:
+  schedule:
+    # GitHub saatleri UTC'dir. 4-19 UTC = İstanbul 07:00-22:59, her 15 dakikada bir.
+    # Sistem config.yaml'daki saatlere bakıp zamanı gelen görevleri kendisi seçer.
+    - cron: "7,22,37,52 4-19 * * *"
+  workflow_dispatch:
+    inputs:
+      komut:
+        description: "Ne yapılsın?"
+        type: choice
+        default: zamani-gelenler
+        options: [zamani-gelenler, kontrol, soz, eczane, vefat, haber]
+      deneme:
+        description: "Deneme modu (Instagram'a paylaşmaz, sadece görselleri üretir)"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: konyadatrafik-story
+  cancel-in-progress: false
+
+jobs:
+  story:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Kurulum
+        run: pip install -r requirements.txt
+
+      - name: Testler
+        if: github.event_name == 'workflow_dispatch'
+        run: python -m pytest -q
+
+      - name: Çalıştır
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          EDITORIAL_GUIDE: ${{ secrets.EDITORIAL_GUIDE }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          KOMUT: ${{ github.event.inputs.komut || 'zamani-gelenler' }}
+          KT_DENEME: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.deneme || vars.DENEME_MODU }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          case "$KOMUT" in
+            kontrol) python -m kt kontrol ;;
+            zamani-gelenler) python -m kt calistir ;;
+            *) KT_GOREV="$KOMUT" python -m kt calistir ;;
+          esac
