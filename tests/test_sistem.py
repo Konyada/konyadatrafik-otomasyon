@@ -356,3 +356,33 @@ def test_haber_bakiye_yoksa_atlanir(tmp_path, monkeypatch):
                         oturum=None, yayinla=lambda *a: ([], []), log=lambda *_: None)
     s = gorevler.haber(b, {"saat": "09:30", "gorev": "haber", "tur": "genel"})
     assert s.durum == "atlandi" and "bakiye" in s.mesaj
+
+
+# ------------------------------------------------------------------ 23:50 vefat (gece yarısı)
+def test_gece_yarisini_gecen_gorev_kendi_gunune_sayilir(tmp_path):
+    from datetime import date as _date
+    d = Durum(tmp_path / "durum.json")
+    plan = [{"saat": "23:50", "gorev": "vefat"}]
+    assert zamani_gelenler(plan, datetime(2026, 11, 10, 23, 40, tzinfo=tarih.TZ), d, 150) == []
+    gelen = zamani_gelenler(plan, datetime(2026, 11, 10, 23, 52, tzinfo=tarih.TZ), d, 150)
+    assert [(slot_kimligi(s), s["gun"]) for s in gelen] == [("23:50-vefat", _date(2026, 11, 10))]
+    gec = datetime(2026, 11, 11, 0, 7, tzinfo=tarih.TZ)          # GitHub gecikmesi: ertesi gün 00:07
+    assert [s["gun"] for s in zamani_gelenler(plan, gec, d, 150)] == [_date(2026, 11, 10)]
+    d.slot_kaydet(_date(2026, 11, 10), "23:50-vefat", durum="paylasildi")
+    assert zamani_gelenler(plan, gec, d, 150) == []
+
+
+def test_elle_vefat_sitedeki_en_guncel_gunu_paylasir(tmp_path, monkeypatch):
+    from datetime import date as _date
+    from kt import gorevler
+    kayitlar = vefat.tablo_coz((FX / "vefat.html").read_text(encoding="utf-8"))
+    monkeypatch.setattr(gorevler.vefat_kaynak, "getir", lambda oturum: kayitlar)
+    cfg = yukle()
+    b = gorevler.Baglam(cfg=cfg, tema=render.Tema.configden(cfg), durum=Durum(tmp_path / "durum.json"),
+                        simdi=datetime(2026, 11, 11, 5, 30, tzinfo=tarih.TZ), deneme=True, cikti=tmp_path,
+                        oturum=None, yayinla=lambda yollar, e: (["DENEME"] * len(yollar), [str(y) for y in yollar]),
+                        log=lambda *_: None)
+    s = gorevler.vefat(b, {"saat": "05:30", "gorev": "vefat", "elle": True})     # 11 Kasım'da kayıt yok
+    assert s.durum == "paylasildi" and s.mesaj.startswith("10 Kasım 2026") and len(s.gorseller) == 1
+    s = gorevler.vefat(b, {"saat": "23:50", "gorev": "vefat", "gun": _date(2026, 11, 11)})
+    assert s.durum == "tekrar"                                                   # zamanlanmış: yalnız kendi günü
