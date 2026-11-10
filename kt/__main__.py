@@ -260,11 +260,13 @@ def kontrol() -> int:
     print("— Ajans ve kurum haberleri")
     from .kaynaklar import ajans as ak
     for kaynak in (cfg.get("ajans") or {}).get("kaynaklar", []):
+        if not kaynak.get("aktif", True):
+            print(f"  {kaynak['ad']}: kapalı (config.yaml)")
+            continue
         try:
             haberler = ak.kaynak_haberleri(oturum, kaynak, tarih.simdi(), 72, 4, log=lambda *_: None)
             fotolu = sum(1 for h in haberler if h.gorsel)
             print(f"  {kaynak['ad']}: son 3 günde {len(haberler)} Konya haberi ({fotolu} tanesi fotoğraflı)")
-            sorun += not haberler
         except Exception as e:  # noqa: BLE001
             print(f"  {kaynak['ad']}: okunamadı ({type(e).__name__})")
             sorun += 1
