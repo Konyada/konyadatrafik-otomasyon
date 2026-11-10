@@ -1,7 +1,10 @@
 """Konya nöbetçi eczaneleri.
 
-Birincil kaynak: 5. Bölge Konya Eczacı Odası'nın nöbet sitesi
-(konyanobetcieczaneleri.com). Ulaşılamazsa posta.com.tr listesi yedek olarak kullanılır.
+Liste (hangi eczaneler nöbette, nöbet saatleri, sıra) 5. Bölge Konya Eczacı Odası'nın nöbet
+sitesinden (konyanobetcieczaneleri.com) alınır. Odanın sitesi telefon ve adresleri tarayıcıda ayrı bir
+adresten yüklüyor ve o adres otomatik erişime kapalı (403); bu yüzden telefon, adres ve ilçe, aynı
+Oda verisini yayınlayan posta.com.tr listesinden eczane adıyla eşleştirilerek eklenir.
+Oda sitesine ulaşılamazsa liste tamamen posta.com.tr'den alınır.
 """
 
 from __future__ import annotations
@@ -9,18 +12,16 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 from datetime import date
-from urllib.parse import urljoin
+from difflib import SequenceMatcher
 
 from bs4 import BeautifulSoup
 
 from . import temiz
-from ..tarih import gun_ay_coz
+from ..tarih import gun_ay_coz, tr_kucuk
 
 RESMI_URL = "https://www.konyanobetcieczaneleri.com/"
 RESMI_AD = "5. Bölge Konya Eczacı Odası"
-# Sayfa, telefon/adres/tarif/ilçe bilgisini tarayıcıda bu adresten ayrıca yükler (sunucu HTML'inde boş gelir).
-VERI_YOLU = "/nobet/onyuz/veri.php"
-YUKLENIYOR = ("yükleniyor", "yukleniyor")
+YUKLENIYOR = ("yükleniyor", "yukleniyor")       # Oda sitesinde telefon yerine duran yer tutucu
 YEDEK_URL = "https://www.posta.com.tr/nobetci-eczaneler/konya/"
 YEDEK_AD = "posta.com.tr (Konya Eczacı Odası verisi)"
 
@@ -35,11 +36,29 @@ class Eczane:
     ilce: str = ""
 
     def adres_kisa(self) -> str:
-        """Adresin sonundaki '· Selçuklu' gibi ilçe ekini atar."""
-        return re.sub(r"\s*·\s*[^·]+$", "", self.adres).strip() if "·" in self.adres else self.adres
+        """Story için kısa adres: 'Mahallesi' → 'Mh.' vb., sondaki ilçe / Konya ekleri atılır."""
+        return adres_kisalt(self.adres, self.ilce)
 
     def story(self) -> dict:
         return {"ad": self.ad, "tel": self.tel, "tarif": self.tarif or self.adres_kisa()}
+
+
+KISALTMALAR = [
+    (r"\bMahallesi\b|\bMah\.(?=\s|,|$)", "Mh."), (r"\bCaddesi\b|\bCad\.(?=\s|,|$)", "Cd."),
+    (r"\bSokağı\b|\bSokak\b|\bSok\.(?=\s|,|$)", "Sk."), (r"\bBulvarı\b", "Blv."),
+]
+
+
+def adres_kisalt(adres: str, ilce: str = "") -> str:
+    a = temiz(adres)
+    a = re.sub(r"\s*·\s*[^·]+$", "", a)                          # Oda sitesindeki "· Selçuklu" eki
+    for desen, yerine in KISALTMALAR:
+        a = re.sub(desen, yerine, a)
+    for _ in range(2):                                           # "... Selçuklu / Konya" gibi sondaki ekler
+        a = re.sub(r"[\s,/–-]*\bKonya\s*$", "", a, flags=re.IGNORECASE)
+        if ilce:
+            a = re.sub(rf"[\s,/–-]*\b{re.escape(ilce)}\s*$", "", a, flags=re.IGNORECASE)
+    return a.strip(" ,/–-")
 
 
 ILCE_SIRASI = ["Selçuklu", "Meram", "Karatay"]
@@ -89,31 +108,7 @@ def _alan(art, ad: str) -> str | None:
     return "" if t.lower().startswith(YUKLENIYOR) else t
 
 
-def resmi_ayrintilar(oturum, html: str) -> dict:
-    """Sayfanın kendi betiğinin yaptığı gibi veri.php'den kart ayrıntılarını alır.
-
-    Dönen sözlük kart anahtarına (data-anahtar, ör. "m-32") göredir:
-    {"m-32": {"adres", "ilce", "tarif", "tel", "telLink", "lat", "lon", "placeId"}, ...}
-    """
-    soup = BeautifulSoup(html, "html.parser")
-    govde = soup.body
-    j = govde.get("data-j", "") if govde else ""
-    if not j:
-        raise RuntimeError("sayfada ayrıntı anahtarı (data-j) yok")
-    url = urljoin(RESMI_URL, govde.get("data-veri") or VERI_YOLU)
-    r = oturum.post(url, data={"j": j, "cf": "", "c": "masaustu", "t": "diger", "k": "normal"},
-                    headers={"Accept": "application/json", "Origin": RESMI_URL.rstrip("/"), "Referer": RESMI_URL},
-                    timeout=30)
-    r.raise_for_status()
-    veri = r.json()
-    if not isinstance(veri, dict) or not veri:
-        raise RuntimeError("ayrıntı verisi boş geldi")
-    return veri
-
-
-def resmi_coz(html: str, referans: date, bolumler: tuple[str, ...] | list[str] = ("merkez",),
-              ayrinti: dict | None = None) -> NobetListesi:
-    """ayrinti: resmi_ayrintilar() sonucu; verilirse telefon, adres, tarif ve gerçek ilçe oradan alınır."""
+def resmi_coz(html: str, referans: date, bolumler: tuple[str, ...] | list[str] = ("merkez",)) -> NobetListesi:
     soup = BeautifulSoup(html, "html.parser")
     pencere_yazi = ""
     for el in soup.find_all(["p", "span", "div"]):
@@ -128,7 +123,6 @@ def resmi_coz(html: str, referans: date, bolumler: tuple[str, ...] | list[str] =
         pencere = f"{m.group(1)} {m.group(2)} {m.group(3)} – {m.group(4)} {m.group(5)} {m.group(6)}"
 
     liste = NobetListesi(baslangic=baslangic, pencere=pencere, kaynak=RESMI_AD)
-    ayrinti = ayrinti or {}
     for bolum in bolumler:
         sec = soup.find("section", attrs={"data-bolum": bolum})
         if not sec:
@@ -158,12 +152,6 @@ def resmi_coz(html: str, referans: date, bolumler: tuple[str, ...] | list[str] =
                         adres = adres or t
             tel = art.get("data-tel", "") or _alan(art, "tel-yazi") or ""
             ilce = bolge if bolge and "-" not in bolge else ""   # tek ilçeli bölge = ilçe tahmini
-            v = ayrinti.get(art.get("data-anahtar", "")) or {}
-            if v:
-                adres = temiz(v.get("adres")) or adres
-                tarif = temiz(v.get("tarif")) or tarif
-                tel = v.get("tel") or v.get("telLink") or tel
-                ilce = temiz(v.get("ilce")) or ilce
             liste.eczaneler.append(Eczane(ad=ad, kapsam=kapsam, adres=adres or "", tarif=tarif or "",
                                           tel=telefon_duzelt(tel), ilce=ilce))
     return liste
@@ -198,38 +186,77 @@ def yedek_coz(html: str, ilceler: list[str] | None = None) -> NobetListesi:
     return liste
 
 
+def _ad_anahtari(ad: str) -> str:
+    """'ÖZGÜL ECZANESİ' / 'Özgül Eczanesi' → 'ozgul' (eşleştirme için)."""
+    t = tr_kucuk(ad)
+    t = re.sub(r"\beczanes[iı]\b|\beczane\b|\becz\b\.?", " ", t)
+    t = t.translate(str.maketrans("çğıöşüâîû", "cgiosuaiu"))
+    return re.sub(r"[^a-z0-9]", "", t)
+
+
+def birlestir(resmi: NobetListesi, yedek: NobetListesi, log=print) -> NobetListesi:
+    """Oda listesindeki her eczaneye yedek listeden telefon, adres ve ilçe ekler (adla eşleştirerek)."""
+    kalan = list(yedek.eczaneler)
+
+    def sec(e: Eczane, adaylar: list[Eczane]) -> Eczane | None:
+        if not adaylar:
+            return None
+        kapsam = tr_kucuk(f"{e.kapsam} {e.ilce}")
+        return next((y for y in adaylar if y.ilce and tr_kucuk(y.ilce) in kapsam), adaylar[0])
+
+    eksik = []
+    for e in resmi.eczaneler:
+        anahtar = _ad_anahtari(e.ad)
+        y = sec(e, [y for y in kalan if _ad_anahtari(y.ad) == anahtar])
+        if y is None:                                            # yazım farkı: en benzer adı dene
+            puanli = sorted(((SequenceMatcher(None, anahtar, _ad_anahtari(y.ad)).ratio(), i)
+                             for i, y in enumerate(kalan)), reverse=True)
+            if puanli and puanli[0][0] >= 0.88:
+                y = kalan[puanli[0][1]]
+        if y is None:
+            eksik.append(e.ad)
+            continue
+        kalan.remove(y)
+        e.tel, e.adres, e.ilce = y.tel or e.tel, y.adres or e.adres, y.ilce or e.ilce
+    eslesen = len(resmi.eczaneler) - len(eksik)
+    log(f"Eczane telefonları: {eslesen}/{len(resmi.eczaneler)} eşleşti"
+        + (f" (eşleşmeyen: {', '.join(eksik)})" if eksik else ""))
+    resmi.kaynak = f"{RESMI_AD}; telefon/adres: posta.com.tr"
+    return resmi
+
+
 def getir(oturum, bugun: date, bolumler=("merkez",), yedek_ilceler=None, log=print) -> NobetListesi:
     hatalar = []
-    telefonsuz = None
+    resmi = yedek = None
     try:
         r = oturum.get(RESMI_URL, timeout=30)
         r.raise_for_status()
-        try:
-            ayrinti = resmi_ayrintilar(oturum, r.text)
-        except Exception as e:  # noqa: BLE001
-            ayrinti = {}
-            hatalar.append(f"resmi site ayrıntıları (telefon/adres): {e}")
-        liste = resmi_coz(r.text, bugun, bolumler, ayrinti)
-        if liste.eczaneler and any(e.tel for e in liste.eczaneler):
-            return liste
-        if liste.eczaneler:
-            telefonsuz = liste                       # isimler var ama telefonlar yok: önce yedeği dene
-            hatalar.append("resmi site: telefonlar alınamadı")
-        else:
-            hatalar.append("resmi site: liste boş")
+        resmi = resmi_coz(r.text, bugun, bolumler)
+        if not resmi.eczaneler:
+            hatalar.append("Oda sitesi: liste boş")
+            resmi = None
     except Exception as e:  # noqa: BLE001
-        hatalar.append(f"resmi site: {e}")
-    log("Eczacı Odası sitesinden tam liste alınamadı, yedek kaynak deneniyor: " + "; ".join(hatalar))
+        hatalar.append(f"Oda sitesi: {e}")
     try:
         r = oturum.get(YEDEK_URL, timeout=30)
         r.raise_for_status()
-        liste = yedek_coz(r.text, yedek_ilceler)
-        if liste.eczaneler:
-            return liste
-        hatalar.append("yedek: liste boş")
+        yedek = yedek_coz(r.text)                                # eşleştirme için bütün ilçeler
+        if not yedek.eczaneler:
+            hatalar.append("posta.com.tr: liste boş")
+            yedek = None
     except Exception as e:  # noqa: BLE001
-        hatalar.append(f"yedek: {e}")
-    if telefonsuz:
-        log("Yedek kaynak da olmadı; Eczacı Odası listesi telefonsuz kullanılıyor.")
-        return telefonsuz
+        hatalar.append(f"posta.com.tr: {e}")
+
+    if resmi and yedek:
+        return birlestir(resmi, yedek, log)
+    if hatalar:
+        log("Uyarı: " + "; ".join(hatalar))
+    if resmi:
+        log("Telefonlar eklenemedi; Eczacı Odası listesi telefonsuz kullanılıyor.")
+        return resmi
+    if yedek:
+        if yedek_ilceler:
+            yedek.eczaneler = [e for e in yedek.eczaneler if e.ilce in yedek_ilceler]
+        if yedek.eczaneler:
+            return yedek
     raise RuntimeError("Nöbetçi eczane listesi alınamadı: " + "; ".join(hatalar))
