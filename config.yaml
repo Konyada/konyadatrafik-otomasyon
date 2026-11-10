@@ -29,8 +29,8 @@ eczane:
   bolumler: [merkez]
   yedek_ilceler: ["Selçuklu", "Meram", "Karatay"]   # yedek kaynak (posta.com.tr) için filtre
 
-vefat:
-  sayfa_basina: 15
+# Vefat ve nöbetçi eczane listeleri her zaman TEK story olarak paylaşılır;
+# kalabalık günlerde satırlar otomatik küçülür, gerekirse iki sütuna geçilir.
 
 haber:
   model: "claude-sonnet-5-5"
