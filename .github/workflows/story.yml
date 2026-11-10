@@ -2,9 +2,10 @@ name: Konya'da Trafik story
 
 on:
   schedule:
-    # GitHub saatleri UTC'dir. 4-19 UTC = İstanbul 07:00-22:59, her 15 dakikada bir.
+    # GitHub saatleri UTC'dir. 4-21 UTC = İstanbul 07:00-00:59, her 15 dakikada bir
+    # (23:50 vefat story'si için 23:52'de ve gecikmeye karşı gece yarısından sonra da uyanır).
     # Sistem config.yaml'daki saatlere bakıp zamanı gelen görevleri kendisi seçer.
-    - cron: "7,22,37,52 4-19 * * *"
+    - cron: "7,22,37,52 4-21 * * *"
   workflow_dispatch:
     inputs:
       komut:
