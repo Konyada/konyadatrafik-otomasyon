@@ -1,5 +1,17 @@
 {
-  "gunler": {},
+  "gunler": {
+    "2026-11-10": {
+      "08:00-soz": {
+        "durum": "paylasildi",
+        "mesaj": "Günün sözü: Üzüm üzüme baka baka kararır.",
+        "medya": [
+          "ig:18155052772501154",
+          "fb:1776728723623155"
+        ],
+        "guncelleme": "2026-11-10T08:38:39+03:00"
+      }
+    }
+  },
   "vefat": {
     "2026-11-09": [
       "e6342714fcb35280",
