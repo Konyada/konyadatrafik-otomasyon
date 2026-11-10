@@ -62,7 +62,9 @@ def eczane(b: Baglam, slot: dict) -> Sonuc:
     liste = eczane_kaynak.getir(b.oturum, b.bugun, tuple(ayar.get("bolumler", ["merkez"])),
                                 ayar.get("yedek_ilceler"), log=b.log)
     if liste.baslangic and not nobet_gecerli_mi(liste.baslangic, b.simdi):
-        return Sonuc("tekrar", f"Liste henüz güncellenmemiş (nöbet başlangıcı {liste.baslangic}).")
+        if not b.deneme:
+            return Sonuc("tekrar", f"Liste henüz güncellenmemiş (nöbet başlangıcı {liste.baslangic}).")
+        b.log(f"  Deneme: liste {liste.baslangic} nöbetine ait (henüz başlamadı); görsel yine de üretiliyor.")
     alt_yazi = liste.pencere if liste.pencere and len(liste.pencere) <= 40 else tarih_yazi(liste.baslangic or b.bugun)
     yollar = render.nobetci_eczaneler(b.tema, eczane_kaynak.ilceye_gore(liste.eczaneler), alt_yazi, b.cikti)
     medya, adresler = b.yayinla(yollar, "eczane")
