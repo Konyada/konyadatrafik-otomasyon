@@ -56,9 +56,10 @@ ajans:
       makale_deseni: "/konya-haberleri/[a-z0-9-]+-\\d+"
       hepsi_konya: true
     - ad: "DHA"
+      aktif: false      # dha.com.tr otomatik okumayı engelliyor (10.11.2026 kontrolü); çözülünce true yapın
       kredi: "Foto: DHA"
       liste: "https://www.dha.com.tr/yerel-haberler/konya/"
-      makale_deseni: "/yerel-haberler/konya/[a-z0-9-]+-\\d+"   # ilk 'kontrol' çalıştırmasında doğrulanacak
+      makale_deseni: "/yerel-haberler/konya/[a-z0-9-]+-\\d+"
       hepsi_konya: true
     - ad: "AA"
       kredi: "Foto: AA"
