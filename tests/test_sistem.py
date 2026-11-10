@@ -335,3 +335,24 @@ def test_ornek_haber_sadece_elle_denemede(tmp_path, monkeypatch):
     assert s.durum == "paylasildi" and len(s.gorseller) == 1
     assert gorevler.haber(baglam(True), {"saat": "09:30", "gorev": "haber"}).durum == "atlandi"      # zamanlanmış
     assert gorevler.haber(baglam(False), {"saat": "09:30", "gorev": "haber", "elle": True}).durum == "atlandi"  # gerçek
+    # API anahtarı varken örnek dosyaya bakılmaz, gerçek akış çalışır (burada sahte ağ yüzünden hata verir)
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test")
+    monkeypatch.setattr(gorevler.ajans_kaynak, "getir", lambda *a, **k: [])
+    with pytest.raises(Exception):
+        gorevler.haber(baglam(True), {"saat": "09:30", "gorev": "haber", "elle": True})
+
+
+def test_haber_bakiye_yoksa_atlanir(tmp_path, monkeypatch):
+    from kt import gorevler
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test")
+    monkeypatch.setattr(gorevler.ajans_kaynak, "getir", lambda *a, **k: [])
+
+    def bakiyesiz(*a, **k):
+        raise haber.HaberHatasi('Claude API hatası 400: {"error": {"message": "Your credit balance is too low"}}')
+    monkeypatch.setattr(gorevler.haber_kaynak, "haber_yaz", bakiyesiz)
+    cfg = yukle()
+    b = gorevler.Baglam(cfg=cfg, tema=render.Tema.configden(cfg), durum=Durum(tmp_path / "durum.json"),
+                        simdi=datetime(2026, 11, 10, 9, 30, tzinfo=tarih.TZ), deneme=False, cikti=tmp_path,
+                        oturum=None, yayinla=lambda *a: ([], []), log=lambda *_: None)
+    s = gorevler.haber(b, {"saat": "09:30", "gorev": "haber", "tur": "genel"})
+    assert s.durum == "atlandi" and "bakiye" in s.mesaj
