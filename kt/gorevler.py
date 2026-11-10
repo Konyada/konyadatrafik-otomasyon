@@ -82,6 +82,8 @@ def vefat(b: Baglam, slot: dict) -> Sonuc:
 
 
 def haber(b: Baglam, slot: dict) -> Sonuc:
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        return Sonuc("atlandi", "Claude API anahtarı (ANTHROPIC_API_KEY) tanımlı değil; haber atlandı.")
     ayar = b.cfg.get("haber", {})
     tur = slot.get("tur", "genel")
     gecmis = b.durum.haber_gecmisi(int(ayar.get("gecmis_gun", 5)), b.bugun)

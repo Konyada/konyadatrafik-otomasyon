@@ -52,7 +52,7 @@ def zamani_gelenler(zamanlama: list[dict], simdi, durum: Durum, tolerans_dk: int
 
 
 class Yayinci:
-    """Görselleri herkese açık adrese yükler ve sırayla Instagram'a story olarak paylaşır."""
+    """Görselleri herkese açık adrese yükler, sırayla Instagram'a ve Facebook sayfasına story olarak paylaşır."""
 
     def __init__(self, cfg: dict, durum: Durum, deneme: bool, log=print):
         self.deneme, self.log, self.durum = deneme, log, durum
@@ -60,15 +60,17 @@ class Yayinci:
         if os.environ.get("GITHUB_ACTIONS") == "true":
             from .gorsel_depo import GorselDepo
             self.depo = GorselDepo(KOK, log=log)
-        self.ig = None
+        self.ig = self.fb = None
         if not deneme:
-            from .instagram import Instagram
+            from .instagram import FacebookSayfa, Instagram
             ayar = cfg.get("instagram", {})
-            self.ig = Instagram(
-                os.environ.get("IG_ACCESS_TOKEN", ""), surum=ayar.get("graph_api_surum", "v23.0"),
-                hesap_id=ayar.get("instagram_hesap_id") or durum.ayar("instagram_hesap_id"),
-                sayfa_id=str(cfg.get("sayfa", {}).get("facebook_sayfa_id", "")), log=log,
-            )
+            token = os.environ.get("IG_ACCESS_TOKEN", "")
+            sayfa_id = str(cfg.get("sayfa", {}).get("facebook_sayfa_id", ""))
+            surum = ayar.get("graph_api_surum", "v23.0")
+            self.ig = Instagram(token, surum=surum, sayfa_id=sayfa_id, log=log,
+                                hesap_id=ayar.get("instagram_hesap_id") or durum.ayar("instagram_hesap_id"))
+            if (cfg.get("facebook") or {}).get("story_paylas", True):
+                self.fb = FacebookSayfa(token, sayfa_id, surum=surum, log=log)
 
     def __call__(self, yollar: list[Path], etiket: str) -> tuple[list[str], list[str]]:
         simdi = tarih.simdi()
@@ -84,13 +86,20 @@ class Yayinci:
         medya = []
         for adres in adresler:
             try:
-                medya.append(self.ig.story_paylas(adres))
+                medya.append("ig:" + self.ig.story_paylas(adres))
             except Exception as ilk_hata:  # noqa: BLE001
                 if self.depo and "raw.githubusercontent.com" in adres:
                     self.log(f"  raw adresi reddedildi ({ilk_hata}); jsDelivr adresiyle yeniden deneniyor.")
-                    medya.append(self.ig.story_paylas(self.depo.yedek_adres(adres)))
+                    adres = self.depo.yedek_adres(adres)
+                    medya.append("ig:" + self.ig.story_paylas(adres))
                 else:
                     raise
+            if self.fb:                       # Facebook sayfası: hata Instagram paylaşımını durdurmaz
+                try:
+                    medya.append("fb:" + self.fb.story_paylas(adres))
+                except Exception as e:  # noqa: BLE001
+                    self.log(f"  Uyarı: Facebook story paylaşılamadı: {e}")
+                    medya.append("fb:hata")
         self.durum.ayar_kaydet("instagram_hesap_id", self.ig.hesap_id())
         return medya, adresler
 
@@ -259,23 +268,43 @@ def kontrol() -> int:
         except Exception as e:  # noqa: BLE001
             print(f"  {kaynak['ad']}: okunamadı ({type(e).__name__})")
             sorun += 1
-    print("— Claude API anahtarı: " + ("tanımlı" if os.environ.get("ANTHROPIC_API_KEY") else "EKSİK"))
-    sorun += not os.environ.get("ANTHROPIC_API_KEY")
+    print("— Claude API anahtarı: " + ("tanımlı" if os.environ.get("ANTHROPIC_API_KEY")
+                                        else "tanımlı değil (haber story'leri atlanır)"))
     cf = os.environ.get("CF_ACCOUNT_ID") and os.environ.get("CF_API_TOKEN")
     print("— Yapay zekâ görseli (Cloudflare): " + ("tanımlı" if cf else "tanımlı değil (temsili görsel üretilmez)"))
+    from .instagram import FacebookSayfa
+    ayar = cfg.get("instagram", {})
+    token = os.environ.get("IG_ACCESS_TOKEN", "")
+    sayfa_id = str(cfg.get("sayfa", {}).get("facebook_sayfa_id", ""))
+    surum = ayar.get("graph_api_surum", "v23.0")
     print("— Instagram")
     try:
-        ayar = cfg.get("instagram", {})
-        ig = Instagram(os.environ.get("IG_ACCESS_TOKEN", ""), surum=ayar.get("graph_api_surum", "v23.0"),
-                       hesap_id=ayar.get("instagram_hesap_id") or None,
-                       sayfa_id=str(cfg.get("sayfa", {}).get("facebook_sayfa_id", "")))
+        ig = Instagram(token, surum=surum, hesap_id=ayar.get("instagram_hesap_id") or None, sayfa_id=sayfa_id)
         bilgi = ig.hesap_bilgisi()
         print(f"  Hesap: @{bilgi.get('username')} (kimlik {ig.hesap_id()}, takipçi {bilgi.get('followers_count')})")
         limit = ig.paylasim_limiti()
         print(f"  Son 24 saatte API ile paylaşım: {limit.get('quota_usage')} / {limit.get('config', {}).get('quota_total')}")
+        if os.environ.get("GITHUB_ACTIONS") == "true":
+            from .gorsel_depo import GorselDepo
+            from .kaynaklar import soz as sk
+            s = sk.gunun_sozu(tarih.bugun())
+            yol = render.gunun_sozu(render.Tema.configden(cfg), s["soz"], s.get("kaynak", "Atasözü"),
+                                    tarih.tarih_yazi(tarih.bugun()), KOK / "cikti" / "kontrol")[0]
+            adres = GorselDepo(KOK).yukle([yol], f"kontrol/{tarih.simdi():%Y%m%d-%H%M%S}")[0]
+            durum = ig.konteyner_dene(adres)
+            print(f"  Deneme görseli: {adres}")
+            print(f"  Instagram görseli {'kabul etti (paylaşılmadı)' if durum == 'FINISHED' else 'kabul etmedi: ' + durum}")
+            sorun += durum != "FINISHED"
     except Exception as e:  # noqa: BLE001
         print(f"  HATA: {e}")
         sorun += 1
+    if (cfg.get("facebook") or {}).get("story_paylas", True):
+        print("— Facebook sayfası")
+        try:
+            print(f"  Sayfa: {FacebookSayfa(token, sayfa_id, surum=surum).kontrol()} — story paylaşımına hazır")
+        except Exception as e:  # noqa: BLE001
+            print(f"  HATA: {e}")
+            sorun += 1
     print("Sonuç: " + ("her şey hazır." if not sorun else f"{sorun} sorun var."))
     return 1 if sorun else 0
 

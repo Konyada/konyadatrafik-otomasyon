@@ -99,3 +99,53 @@ class Instagram:
         medya = self._istek("POST", f"{ig}/media_publish", creation_id=konteyner)["id"]
         self.log(f"  Instagram'a story paylaşıldı (medya {medya}).")
         return medya
+
+    def konteyner_dene(self, gorsel_url: str) -> str:
+        """Story konteyneri oluşturup Instagram'ın görseli kabul ettiğini doğrular; PAYLAŞMAZ.
+        (Paylaşılmayan konteyner 24 saat sonra kendiliğinden silinir.)"""
+        ig = self.hesap_id()
+        konteyner = self._istek("POST", f"{ig}/media", media_type="STORIES", image_url=gorsel_url)["id"]
+        for i in range(12):
+            durum = self._istek("GET", konteyner, fields="status_code").get("status_code", "")
+            if durum in ("FINISHED", "ERROR", "EXPIRED"):
+                return durum
+            time.sleep(3 if i < 5 else 8)
+        return "ZAMAN_ASIMI"
+
+
+class FacebookSayfa:
+    """Facebook sayfasına fotoğraf story'si.
+
+    Sistem kullanıcısı token'ı ile sayfa token'ı alınır, fotoğraf yayımlanmadan yüklenir
+    (/photos, published=false) ve /photo_stories ile story yapılır. Gereken izinler:
+    pages_manage_posts, pages_read_engagement, pages_show_list.
+    """
+
+    def __init__(self, token: str, sayfa_id: str, surum: str = "v23.0", log=print):
+        if not sayfa_id:
+            raise InstagramHatasi("Facebook sayfa kimliği (config.yaml > sayfa.facebook_sayfa_id) eksik.")
+        self.surum, self.sayfa_id, self.log = surum, sayfa_id, log
+        self.sistem = Instagram(token, surum=surum, sayfa_id=sayfa_id, log=log)
+        self._sayfa: Instagram | None = None
+
+    def _sayfa_istemcisi(self) -> Instagram:
+        if self._sayfa is None:
+            veri = self.sistem._istek("GET", self.sayfa_id, fields="access_token,name")
+            sayfa_token = veri.get("access_token")
+            if not sayfa_token:
+                raise InstagramHatasi("Facebook sayfa erişim anahtarı alınamadı (sayfa yetkisi ya da izin eksik).")
+            self.ad = veri.get("name", "")
+            self._sayfa = Instagram(sayfa_token, surum=self.surum, sayfa_id=self.sayfa_id, log=self.log)
+        return self._sayfa
+
+    def kontrol(self) -> str:
+        self._sayfa_istemcisi()
+        return self.ad
+
+    def story_paylas(self, gorsel_url: str) -> str:
+        s = self._sayfa_istemcisi()
+        foto = s._istek("POST", f"{self.sayfa_id}/photos", url=gorsel_url, published="false")["id"]
+        sonuc = s._istek("POST", f"{self.sayfa_id}/photo_stories", photo_id=foto)
+        kimlik = str(sonuc.get("post_id") or foto)
+        self.log(f"  Facebook sayfasına story paylaşıldı ({kimlik}).")
+        return kimlik
