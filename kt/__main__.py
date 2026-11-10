@@ -220,9 +220,8 @@ def onizleme() -> int:
     fx = KOK / "tests" / "fixtures"
     s = sk.gunun_sozu(bugun)
     yollar = render.gunun_sozu(tema, s["soz"], s.get("kaynak", "Atasözü"), tarih.tarih_yazi(bugun), cikti)
-    import json
-    liste = ek.resmi_coz((fx / "eczane_resmi_canli.html").read_text(encoding="utf-8"), bugun, ("merkez",),
-                         json.loads((fx / "eczane_veri.json").read_text(encoding="utf-8")))
+    liste = ek.birlestir(ek.resmi_coz((fx / "eczane_resmi_canli.html").read_text(encoding="utf-8"), bugun),
+                         ek.yedek_coz((fx / "eczane_posta.html").read_text(encoding="utf-8")), log=lambda *_: None)
     yollar += render.nobetci_eczaneler(tema, ek.ilceye_gore(liste.eczaneler), tarih.tarih_yazi(bugun), cikti)
     kayitlar = vk.tablo_coz((fx / "vefat.html").read_text(encoding="utf-8"))
     yollar += render.vefat_edenler(tema, [k.story() for k in kayitlar], tarih.tarih_yazi(bugun), cikti)
@@ -259,16 +258,16 @@ def kontrol() -> int:
         except Exception as e:  # noqa: BLE001
             print(f"  {ad}: ulaşılamadı ({type(e).__name__})")
             sorun += 1
-    try:                                        # telefon/adres/ilçe sayfaya ayrıca yükleniyor: o da çalışıyor mu?
-        r = oturum.get(ek.RESMI_URL, timeout=30)
-        ayrinti = ek.resmi_ayrintilar(oturum, r.text)
-        liste = ek.resmi_coz(r.text, tarih.bugun(), tuple((cfg.get("eczane") or {}).get("bolumler", ["merkez"])), ayrinti)
+    try:                                        # Oda listesi + posta.com.tr telefonları eşleşiyor mu?
+        ayar = cfg.get("eczane") or {}
+        liste = ek.getir(oturum, tarih.bugun(), tuple(ayar.get("bolumler", ["merkez"])), ayar.get("yedek_ilceler"),
+                         log=lambda m: print(f"  {m}"))
         telefonlu = sum(1 for e in liste.eczaneler if e.tel)
         ilceler = ", ".join(f"{g} {len(x)}" for g, x in ek.ilceye_gore(liste.eczaneler))
-        print(f"  Eczane ayrıntıları: {len(liste.eczaneler)} eczane, {telefonlu} telefonlu ({ilceler})")
+        print(f"  Nöbetçi eczane: {len(liste.eczaneler)} eczane, {telefonlu} telefonlu ({ilceler}) — {liste.kaynak}")
         sorun += telefonlu == 0
     except Exception as e:  # noqa: BLE001
-        print(f"  Eczane ayrıntıları alınamadı ({type(e).__name__}: {e})")
+        print(f"  Nöbetçi eczane listesi alınamadı ({type(e).__name__}: {e})")
         sorun += 1
     print("— Ajans ve kurum haberleri")
     from .kaynaklar import ajans as ak

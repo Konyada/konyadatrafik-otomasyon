@@ -65,10 +65,15 @@ def eczane(b: Baglam, slot: dict) -> Sonuc:
         if not b.deneme:
             return Sonuc("tekrar", f"Liste henüz güncellenmemiş (nöbet başlangıcı {liste.baslangic}).")
         b.log(f"  Deneme: liste {liste.baslangic} nöbetine ait (henüz başlamadı); görsel yine de üretiliyor.")
+    telefonlu = sum(1 for e in liste.eczaneler if e.tel)
+    if telefonlu < 0.8 * len(liste.eczaneler) and not b.deneme and not slot.get("elle"):
+        saat, dakika = (int(x) for x in str(slot.get("saat", "00:00")).split(":"))
+        if b.simdi - b.simdi.replace(hour=saat, minute=dakika, second=0, microsecond=0) < timedelta(minutes=60):
+            return Sonuc("tekrar", f"{len(liste.eczaneler) - telefonlu} eczanenin telefonu henüz bulunamadı; "
+                                   "15 dakika sonra tekrar denenecek.")
     alt_yazi = liste.pencere if liste.pencere and len(liste.pencere) <= 40 else tarih_yazi(liste.baslangic or b.bugun)
     yollar = render.nobetci_eczaneler(b.tema, eczane_kaynak.ilceye_gore(liste.eczaneler), alt_yazi, b.cikti)
     medya, adresler = b.yayinla(yollar, "eczane")
-    telefonlu = sum(1 for e in liste.eczaneler if e.tel)
     return Sonuc("paylasildi", f"{len(liste.eczaneler)} nöbetçi eczane, tek story ({liste.kaynak}; "
                                f"{telefonlu} telefonlu)", yollar, medya, adresler)
 
