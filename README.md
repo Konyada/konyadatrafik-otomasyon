@@ -1,7 +1,8 @@
 # Konya'da Trafik — Otomatik Story Sistemi
 
-@konyada_trafik Instagram hesabına her gün kendiliğinden story atan sistem.
-GitHub'da ücretsiz çalışır, sunucu gerekmez. Paylaşım Meta'nın resmi Instagram API'siyle yapılır.
+@konyada_trafik Instagram hesabına ve Konya'da Trafik Facebook sayfasına her gün kendiliğinden
+story atan sistem. GitHub'da ücretsiz çalışır, sunucu gerekmez. Paylaşım Meta'nın resmi API'siyle yapılır
+(Facebook sayfasına story atmayı kapatmak için `config.yaml > facebook.story_paylas: false`).
 
 ## Ne paylaşır?
 
@@ -65,7 +66,8 @@ Konya'da Trafik Facebook sayfası Ulusoy Dijital Medya portföyünde ve @konyada
    Instagram hesabı ve 1. adımdaki uygulama.
 4. **Yeni token oluştur** → uygulamayı seçin → süre: **Asla sona ermez** → izinler:
    `instagram_basic`, `instagram_content_publish`, `pages_show_list`, `pages_read_engagement`,
-   `business_management` → oluşturun ve token'ı kopyalayın.
+   `business_management`, `instagram_manage_messages`, `instagram_manage_comments`,
+   `instagram_manage_insights`, `pages_manage_posts`, `pages_manage_metadata` → oluşturun ve token'ı kopyalayın.
 
 ### 4. Claude API anahtarı (haberler için)
 platform.claude.com → **API Keys → Create Key** (hesaba ödeme yöntemi eklenmiş olmalı).

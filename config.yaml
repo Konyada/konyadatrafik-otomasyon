@@ -7,6 +7,9 @@ sayfa:
   instagram: "konyada_trafik"
   facebook_sayfa_id: "1126140313914983"
 
+facebook:
+  story_paylas: true      # aynı story'ler Konya'da Trafik Facebook sayfasına da atılır
+
 instagram:
   graph_api_surum: "v23.0"
   # Boş bırakılırsa Facebook sayfasına bağlı Instagram hesabı otomatik bulunur.
