@@ -53,6 +53,73 @@ def test_eczane_resmi_site_ilceler_dahil():
     assert len(liste.eczaneler) == 4 and liste.eczaneler[-1].ilce == "Akşehir"
 
 
+class _EczaneOturumu:
+    """GET: sayfa HTML'i (veya yedek), POST: veri.php yanıtı. Hata vermesi istenen adresler için istisna atar."""
+
+    def __init__(self, sayfa, veri=None, yedek=None, veri_hatasi=None):
+        self.sayfa, self.veri, self.yedek, self.veri_hatasi = sayfa, veri, yedek, veri_hatasi
+        self.postlar = []
+
+    class _Yanit:
+        def __init__(self, metin="", veri=None, kod=200):
+            self.text, self._veri, self.status_code = metin, veri, kod
+
+        def raise_for_status(self):
+            if self.status_code >= 400:
+                raise RuntimeError(f"HTTP {self.status_code}")
+
+        def json(self):
+            return self._veri
+
+    def get(self, url, **kw):
+        if url == eczane.RESMI_URL:
+            return self._Yanit(self.sayfa)
+        if url == eczane.YEDEK_URL and self.yedek is not None:
+            return self._Yanit(self.yedek)
+        return self._Yanit(kod=503)
+
+    def post(self, url, **kw):
+        self.postlar.append((url, kw))
+        if self.veri_hatasi:
+            return self._Yanit(kod=self.veri_hatasi)
+        return self._Yanit(veri=self.veri)
+
+
+def _canli():
+    import json
+    return ((FX / "eczane_resmi_canli.html").read_text(encoding="utf-8"),
+            json.loads((FX / "eczane_veri.json").read_text(encoding="utf-8")))
+
+
+def test_eczane_canli_yapi_veri_php():
+    html, veri = _canli()
+    o = _EczaneOturumu(html, veri)
+    liste = eczane.getir(o, date(2026, 11, 10), log=lambda *_: None)
+    url, kw = o.postlar[0]
+    assert url == "https://www.konyanobetcieczaneleri.com/nobet/onyuz/veri.php"
+    assert kw["data"]["j"] == "TEST-ANAHTAR" and kw["data"]["cf"] == "" and kw["headers"]["Accept"] == "application/json"
+    assert liste.kaynak == eczane.RESMI_AD and liste.baslangic == date(2026, 11, 10)
+    assert [e.tel for e in liste.eczaneler] == ["0332 000 00 01", "0332 000 00 02", "0332 000 00 03", "0332 000 00 04"]
+    yesil = liste.eczaneler[2]
+    assert yesil.kapsam == "Karatay - Meram" and yesil.ilce == "Karatay" and yesil.tarif == "Ticaret Borsası Yanı"
+    # gruplar nöbet bölgesine göre değil eczanenin bulunduğu ilçeye göre: 3 başlık
+    gruplar = eczane.ilceye_gore(liste.eczaneler)
+    assert [(g, [e["ad"] for e in es]) for g, es in gruplar] == [
+        ("Selçuklu", ["Örnek Eczanesi", "Deneme Eczanesi"]), ("Meram", ["Mavi Eczanesi"]), ("Karatay", ["Yeşil Eczanesi"])]
+    assert gruplar[0][1][1]["tarif"] == "Hocacihan Mh. Deneme Sk. No: 2"        # tarif yoksa adres
+
+
+def test_eczane_ayrinti_alinamazsa_yedek_sonra_telefonsuz():
+    html, _ = _canli()
+    yedek = (FX / "eczane_posta.html").read_text(encoding="utf-8")
+    liste = eczane.getir(_EczaneOturumu(html, veri_hatasi=403, yedek=yedek), date(2026, 11, 10),
+                         yedek_ilceler=["Selçuklu", "Meram", "Karatay"], log=lambda *_: None)
+    assert liste.kaynak == eczane.YEDEK_AD and liste.eczaneler[0].tel == "0332 000 00 01"
+    liste = eczane.getir(_EczaneOturumu(html, veri_hatasi=403), date(2026, 11, 10), log=lambda *_: None)
+    assert liste.kaynak == eczane.RESMI_AD and len(liste.eczaneler) == 4 and not any(e.tel for e in liste.eczaneler)
+    assert liste.eczaneler[0].adres == ""                                        # "Yükleniyor…" alınmadı
+
+
 def test_eczane_yedek_kaynak():
     liste = eczane.yedek_coz((FX / "eczane_posta.html").read_text(encoding="utf-8"), ["Selçuklu", "Meram", "Karatay"])
     assert liste.baslangic == date(2026, 11, 10)
@@ -180,11 +247,11 @@ def test_gorseller_instagram_uygun(tmp_path):
     yollar = render.gunun_sozu(tema, "Damlaya damlaya göl olur.", "Atasözü", "10 Kasım 2026 Salı", tmp_path)
     kayitlar = [k.story() for k in vefat.tablo_coz((FX / "vefat.html").read_text(encoding="utf-8"))] * 6
     v = render.vefat_edenler(tema, kayitlar, "10 Kasım 2026 Salı", tmp_path)
-    assert len(v) == 2                                     # 24 kayıt -> 2 sayfa
+    assert len(v) == 1                                     # 24 kayıt -> yine tek story
     liste = eczane.resmi_coz((FX / "eczane_resmi.html").read_text(encoding="utf-8"), date(2026, 11, 10))
     cok = [("Selçuklu", [liste.eczaneler[0].story()] * 14), ("Meram", [liste.eczaneler[1].story()] * 5)]
     e = render.nobetci_eczaneler(tema, cok, "10 Kasım 2026 Salı", tmp_path)
-    assert len(e) == 2                                     # 19 eczane -> 2 sayfa
+    assert len(e) == 1                                     # 19 eczane -> yine tek story
     foto = tmp_path / "foto.jpg"
     Image.new("RGB", (1600, 900), (90, 120, 160)).save(foto)
     h1 = render.haber(tema, "Kulu", "SORUŞTURMA", "Başlık " * 30, ["Bir", "İki"], "Uzun metin " * 120,
@@ -192,7 +259,7 @@ def test_gorseller_instagram_uygun(tmp_path):
     h2 = render.haber(tema, "", "GÜNDEM", "Kısa başlık", [], "Kısa metin.", "", "10 Kasım 2026", tmp_path,
                       dosya_adi="h2.jpg")
     yollar += v + e + h1 + h2
-    assert len(yollar) >= 7
+    assert len(yollar) == 5                                # söz + vefat + eczane + 2 haber
     for y in yollar:
         with Image.open(y) as im:
             assert im.size == (1080, 1920) and im.format == "JPEG" and im.mode == "RGB"
@@ -207,3 +274,36 @@ def test_nobet_penceresi():
     assert not nobet_gecerli_mi(dun, datetime(2026, 11, 10, 8, 45, tzinfo=tz))    # 08:30'dan sonra eski liste
     assert nobet_gecerli_mi(bugun, datetime(2026, 11, 10, 8, 45, tzinfo=tz))
     assert not nobet_gecerli_mi(bugun, datetime(2026, 11, 10, 8, 0, tzinfo=tz))   # henüz başlamadı
+
+
+# ------------------------------------------------------------------ tek sayfa düzenleri
+def test_vefat_her_zaman_tek_sayfa(tmp_path):
+    tema = render.Tema.configden(yukle())
+    onceki = None
+    for adet in (1, 15, 16, 20, 21, 30, 31, 50):
+        kompakt, sutun, satir, kapasite = render.vefat_duzeni(adet)
+        assert adet <= kapasite, adet                      # 50 kişiye kadar hepsi sığar
+        boyut = (sutun, -satir, kompakt)
+        assert onceki is None or boyut >= onceki           # kalabalıklaştıkça düzen küçülür, büyümez
+        onceki = boyut
+    assert render.vefat_duzeni(15)[:3] == (False, 1, 64)   # 15 kişiye kadar şablondaki boyut
+    assert render.vefat_duzeni(25)[1] == 2                 # kalabalıkta iki sütun
+    kayitlar = [{"ad": f"Kişi {i}", "defin": "Musalla"} for i in range(80)]
+    yollar = render.vefat_edenler(tema, kayitlar, "10 Kasım 2026 Salı", tmp_path)
+    assert len(yollar) == 1                                # aşırı kalabalıkta da tek story (+N kişi daha)
+
+
+def test_eczane_her_zaman_tek_sayfa(tmp_path):
+    tema = render.Tema.configden(yukle())
+    e = {"ad": "Örnek Eczanesi", "tel": "0332 000 00 01", "tarif": "Örnek Hastanesi Karşısı"}
+    d, sutunlar, tasan = render.eczane_duzeni([("Selçuklu", [e] * 6), ("Meram", [e] * 2), ("Karatay", [e] * 3)])
+    assert (d.kompakt, d.sutun, d.tip, d.satir, tasan) == (False, 1, "tarifli", 75, 0)   # olağan gün: şablon boyutu
+    for dagilim in ([7, 4, 4], [9, 6, 5], [12, 9, 9], [3] * 12):
+        gruplar = [(f"İlçe {i}", [e] * n) for i, n in enumerate(dagilim)]
+        d, sutunlar, tasan = render.eczane_duzeni(gruplar)
+        assert tasan == 0, dagilim
+        yerlesen = sum(1 for s in sutunlar for t, _ in s if t == "eczane")
+        assert yerlesen == sum(dagilim)
+        assert len(render.nobetci_eczaneler(tema, gruplar, "10 Kasım", tmp_path)) == 1
+    d, sutunlar, tasan = render.eczane_duzeni([("Konya", [e] * 200)])
+    assert tasan > 0 and len(render.nobetci_eczaneler(tema, [("Konya", [e] * 200)], "10 Kasım", tmp_path)) == 1
