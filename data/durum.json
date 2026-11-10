@@ -9,6 +9,18 @@
           "fb:1776728723623155"
         ],
         "guncelleme": "2026-11-10T08:38:39+03:00"
+      },
+      "08:45-eczane": {
+        "durum": "tekrar",
+        "mesaj": "12 eczanenin telefonu henüz bulunamadı; 15 dakika sonra tekrar denenecek.",
+        "medya": [],
+        "guncelleme": "2026-11-10T09:41:07+03:00"
+      },
+      "09:30-haber-genel": {
+        "durum": "atlandi",
+        "mesaj": "Claude API bakiyesi yetersiz (Claude Console'dan kredi yükleyin); haber atlandı.",
+        "medya": [],
+        "guncelleme": "2026-11-10T09:41:22+03:00"
       }
     }
   },
