@@ -79,14 +79,13 @@ zamanlama:
   - {saat: "08:00", gorev: soz}
   - {saat: "08:45", gorev: eczane}
   - {saat: "09:30", gorev: haber, tur: genel}
-  - {saat: "11:00", gorev: vefat}
+  - {saat: "11:00", gorev: vefat}          # günde tek vefat story'si
   - {saat: "11:30", gorev: haber, tur: trafik}
   - {saat: "12:30", gorev: haber, tur: selcuklu}
   - {saat: "13:30", gorev: haber, tur: buyuksehir}
   - {saat: "15:30", gorev: haber, tur: genel}
   - {saat: "17:30", gorev: haber, tur: konyaspor}
   - {saat: "19:30", gorev: haber, tur: genel}
-  - {saat: "21:00", gorev: vefat}
 
 # Bir görev saatinden en fazla kaç dakika sonra hâlâ çalıştırılabilir
 # (GitHub gecikmeleri ve verinin geç güncellenmesi için).
