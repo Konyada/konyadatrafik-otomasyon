@@ -303,3 +303,35 @@ def test_eczane_her_zaman_tek_sayfa(tmp_path):
         assert len(render.nobetci_eczaneler(tema, gruplar, "10 Kasım", tmp_path)) == 1
     d, sutunlar, tasan = render.eczane_duzeni([("Konya", [e] * 200)])
     assert tasan > 0 and len(render.nobetci_eczaneler(tema, [("Konya", [e] * 200)], "10 Kasım", tmp_path)) == 1
+
+
+# ------------------------------------------------------------------ örnek haber (yalnızca elle + deneme)
+def test_ornek_haber_sadece_elle_denemede(tmp_path, monkeypatch):
+    import json
+    from kt import gorevler
+    ornek = {"konum": "KONYA", "kategori": "KAZA", "baslik": "Örnek başlık", "etiketler": ["Bir"],
+             "metin": "Örnek metin.", "kapanis": "", "kaynak_adi": "İHA", "kaynak_url": "https://www.iha.com.tr/x",
+             "ajans": {"ad": "İHA", "gorsel": "https://cdn.iha.com.tr/yok.jpg", "kredi": "Foto: İHA"}}
+    dosya = tmp_path / "ornek_haber.json"
+    dosya.write_text(json.dumps(ornek, ensure_ascii=False), encoding="utf-8")
+    monkeypatch.setattr(gorevler, "ORNEK_HABER", dosya)
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+
+    class _Kapali:                                   # ağ yok: fotoğraf inmez, story fotoğrafsız üretilir
+        def get(self, *a, **k):
+            raise ConnectionError("ağ yok")
+        post = get
+
+    def baglam(deneme):
+        cfg = yukle()
+        cfg["haber"] = dict(cfg.get("haber") or {}, gorsel_sirasi=["ajans"])
+        return gorevler.Baglam(cfg=cfg, tema=render.Tema.configden(cfg), durum=Durum(tmp_path / "durum.json"),
+                               simdi=datetime(2026, 11, 10, 9, 30, tzinfo=tarih.TZ), deneme=deneme,
+                               cikti=tmp_path / "cikti", oturum=_Kapali(),
+                               yayinla=lambda yollar, etiket: (["DENEME"] * len(yollar), [str(y) for y in yollar]),
+                               log=lambda *_: None)
+
+    s = gorevler.haber(baglam(True), {"saat": "09:30", "gorev": "haber", "elle": True})
+    assert s.durum == "paylasildi" and len(s.gorseller) == 1
+    assert gorevler.haber(baglam(True), {"saat": "09:30", "gorev": "haber"}).durum == "atlandi"      # zamanlanmış
+    assert gorevler.haber(baglam(False), {"saat": "09:30", "gorev": "haber", "elle": True}).durum == "atlandi"  # gerçek
