@@ -197,3 +197,13 @@ def test_gorseller_instagram_uygun(tmp_path):
         with Image.open(y) as im:
             assert im.size == (1080, 1920) and im.format == "JPEG" and im.mode == "RGB"
         assert y.stat().st_size < 8 * 1024 * 1024
+
+
+def test_nobet_penceresi():
+    from kt.gorevler import nobet_gecerli_mi
+    tz = tarih.TZ
+    dun, bugun = date(2026, 11, 9), date(2026, 11, 10)
+    assert nobet_gecerli_mi(dun, datetime(2026, 11, 10, 3, 15, tzinfo=tz))        # gece: dünkü nöbet geçerli
+    assert not nobet_gecerli_mi(dun, datetime(2026, 11, 10, 8, 45, tzinfo=tz))    # 08:30'dan sonra eski liste
+    assert nobet_gecerli_mi(bugun, datetime(2026, 11, 10, 8, 45, tzinfo=tz))
+    assert not nobet_gecerli_mi(bugun, datetime(2026, 11, 10, 8, 0, tzinfo=tz))   # henüz başlamadı
