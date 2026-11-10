@@ -105,10 +105,10 @@ ORNEK_HABER = KOK / "data" / "ornek_haber.json"
 
 
 def haber(b: Baglam, slot: dict) -> Sonuc:
-    # Örnek haber: yalnızca ELLE başlatılan DENEME çalıştırmasında, tasarımı görmek için kullanılır.
-    # Zamanlanmış görevler ve gerçek paylaşımlar bu dosyaya hiç bakmaz.
+    # Örnek haber: Claude API anahtarı YOKKEN, yalnızca ELLE başlatılan DENEME çalıştırmasında tasarımı
+    # görmek için kullanılır. Anahtar varken, zamanlanmış görevlerde ve gerçek paylaşımlarda hiç kullanılmaz.
     ornek = None
-    if b.deneme and slot.get("elle") and ORNEK_HABER.exists():
+    if b.deneme and slot.get("elle") and ORNEK_HABER.exists() and not os.environ.get("ANTHROPIC_API_KEY"):
         ornek = json.loads(ORNEK_HABER.read_text(encoding="utf-8"))
         b.log("  Deneme: data/ornek_haber.json'daki örnek haber kullanılıyor (yapay zekâ çağrılmadı).")
     if ornek is None and not os.environ.get("ANTHROPIC_API_KEY"):
