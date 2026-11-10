@@ -180,3 +180,44 @@ def test_haber_foto_notu_basilir(tmp_path):
                        foto=foto, foto_notu="Foto: İHA")[0]
     with Image.open(yol) as im:
         assert im.size == (1080, 1920)
+
+
+class _GraphOturum:
+    """Graph API için sahte oturum: yolu ve token'ı kaydeder."""
+    kayit: list = []
+
+    def __init__(self):
+        self.headers = {}
+
+    def _yanit(self, yol):
+        yanitlar = {
+            "1126140313914983": {"access_token": "SAYFA_TOKEN", "name": "Konya'da Trafik"},
+            "1126140313914983/photos": {"id": "FOTO1"},
+            "1126140313914983/photo_stories": {"success": True, "post_id": "STORY1"},
+        }
+        return Yanit(js=yanitlar.get(yol, {}), tur="application/json")
+
+    def get(self, url, params=None, timeout=None):
+        yol = url.split("/v23.0/", 1)[1]
+        _GraphOturum.kayit.append(("GET", yol, self.headers.get("Authorization"), dict(params or {})))
+        return self._yanit(yol)
+
+    def post(self, url, data=None, timeout=None):
+        yol = url.split("/v23.0/", 1)[1]
+        _GraphOturum.kayit.append(("POST", yol, self.headers.get("Authorization"), dict(data or {})))
+        return self._yanit(yol)
+
+
+def test_facebook_sayfa_story(monkeypatch):
+    from kt import instagram
+    _GraphOturum.kayit = []
+    monkeypatch.setattr(instagram.requests, "Session", _GraphOturum)
+    fb = instagram.FacebookSayfa("SISTEM_TOKEN", "1126140313914983")
+    assert fb.story_paylas("https://raw.githubusercontent.com/x/y/z/a.jpg") == "STORY1"
+    yontemler = [(k[0], k[1]) for k in _GraphOturum.kayit]
+    assert yontemler == [("GET", "1126140313914983"), ("POST", "1126140313914983/photos"),
+                         ("POST", "1126140313914983/photo_stories")]
+    assert _GraphOturum.kayit[0][2] == "Bearer SISTEM_TOKEN"            # sayfa token'ı sistem token'ıyla alınır
+    assert _GraphOturum.kayit[1][2] == "Bearer SAYFA_TOKEN"             # paylaşım sayfa token'ıyla yapılır
+    assert _GraphOturum.kayit[1][3] == {"url": "https://raw.githubusercontent.com/x/y/z/a.jpg", "published": "false"}
+    assert _GraphOturum.kayit[2][3] == {"photo_id": "FOTO1"}
