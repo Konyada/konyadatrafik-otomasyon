@@ -70,6 +70,23 @@
         ],
         "guncelleme": "2026-11-11T00:25:14+03:00"
       }
+    },
+    "2026-11-11": {
+      "08:00-soz": {
+        "durum": "paylasildi",
+        "mesaj": "Günün sözü: Yalancının mumu yatsıya kadar yanar.",
+        "medya": [
+          "ig:18221698192350623",
+          "fb:1169107198970899"
+        ],
+        "guncelleme": "2026-11-11T08:56:43+03:00"
+      },
+      "08:45-eczane": {
+        "durum": "tekrar",
+        "mesaj": "12 eczanenin telefonu henüz bulunamadı; 15 dakika sonra tekrar denenecek.",
+        "medya": [],
+        "guncelleme": "2026-11-11T08:56:45+03:00"
+      }
     }
   },
   "vefat": {
