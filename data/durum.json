@@ -82,10 +82,19 @@
         "guncelleme": "2026-11-11T08:56:43+03:00"
       },
       "08:45-eczane": {
-        "durum": "tekrar",
-        "mesaj": "12 eczanenin telefonu henüz bulunamadı; 15 dakika sonra tekrar denenecek.",
+        "durum": "paylasildi",
+        "mesaj": "12 nöbetçi eczane, tek story (5. Bölge Konya Eczacı Odası; telefon/adres: posta.com.tr; 0 telefonlu)",
+        "medya": [
+          "ig:17956972299037808",
+          "fb:1686883989833653"
+        ],
+        "guncelleme": "2026-11-11T10:07:07+03:00"
+      },
+      "09:30-haber-genel": {
+        "durum": "atlandi",
+        "mesaj": "Claude API bakiyesi yetersiz (Claude Console'dan kredi yükleyin); haber atlandı.",
         "medya": [],
-        "guncelleme": "2026-11-11T08:56:45+03:00"
+        "guncelleme": "2026-11-11T10:07:25+03:00"
       }
     }
   },
