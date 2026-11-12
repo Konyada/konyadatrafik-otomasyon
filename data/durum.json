@@ -141,6 +141,23 @@
         ],
         "guncelleme": "2026-11-12T00:32:02+03:00"
       }
+    },
+    "2026-11-12": {
+      "08:00-soz": {
+        "durum": "paylasildi",
+        "mesaj": "Günün sözü: Akıl akıldan üstündür.",
+        "medya": [
+          "ig:18160480351508359",
+          "fb:1452844757024654"
+        ],
+        "guncelleme": "2026-11-12T08:58:57+03:00"
+      },
+      "08:45-eczane": {
+        "durum": "tekrar",
+        "mesaj": "12 eczanenin telefonu henüz bulunamadı; 15 dakika sonra tekrar denenecek.",
+        "medya": [],
+        "guncelleme": "2026-11-12T08:58:58+03:00"
+      }
     }
   },
   "vefat": {
