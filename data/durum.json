@@ -202,6 +202,15 @@
         "mesaj": "Claude API bakiyesi yetersiz (Claude Console'dan kredi yükleyin); haber atlandı.",
         "medya": [],
         "guncelleme": "2026-11-12T19:44:32+03:00"
+      },
+      "23:50-vefat": {
+        "durum": "paylasildi",
+        "mesaj": "12 Kasım 2026 Perşembe: 15 vefat kaydı, tek story",
+        "medya": [
+          "ig:18137385730808615",
+          "fb:1169190686068675"
+        ],
+        "guncelleme": "2026-11-13T00:21:45+03:00"
       }
     }
   },
@@ -253,6 +262,23 @@
       "2a234917839d60a5",
       "df6b208ad0a5a500",
       "a73e091afd28b694"
+    ],
+    "2026-11-12": [
+      "f9b3b4013ce88ced",
+      "5f5320c4492990ab",
+      "2a6a89309096173b",
+      "b937a3fb1c7ecaa2",
+      "4ba3db04a74885fe",
+      "64121b0962804727",
+      "1789684458a7746a",
+      "049ec3ab2f597ebb",
+      "8057ce0be5461d15",
+      "d09832821b42d38c",
+      "73b352ce78019803",
+      "5dd3d215f7534ebe",
+      "6fdb4ab1f49e58ac",
+      "e7188edad09f5e0f",
+      "69b532472ebdeeb3"
     ]
   },
   "haberler": [],
