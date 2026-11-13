@@ -212,6 +212,23 @@
         ],
         "guncelleme": "2026-11-13T00:21:45+03:00"
       }
+    },
+    "2026-11-13": {
+      "08:00-soz": {
+        "durum": "paylasildi",
+        "mesaj": "Günün sözü: Ateş düştüğü yeri yakar.",
+        "medya": [
+          "ig:18108734846573305",
+          "fb:1433807031716366"
+        ],
+        "guncelleme": "2026-11-13T08:57:33+03:00"
+      },
+      "08:45-eczane": {
+        "durum": "tekrar",
+        "mesaj": "12 eczanenin telefonu henüz bulunamadı; 15 dakika sonra tekrar denenecek.",
+        "medya": [],
+        "guncelleme": "2026-11-13T08:57:35+03:00"
+      }
     }
   },
   "vefat": {
