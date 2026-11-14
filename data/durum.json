@@ -332,6 +332,12 @@
         "mesaj": "Claude API bakiyesi yetersiz (Claude Console'dan kredi yükleyin); haber atlandı.",
         "medya": [],
         "guncelleme": "2026-11-14T15:45:12+03:00"
+      },
+      "17:30-haber-konyaspor": {
+        "durum": "atlandi",
+        "mesaj": "Claude API bakiyesi yetersiz (Claude Console'dan kredi yükleyin); haber atlandı.",
+        "medya": [],
+        "guncelleme": "2026-11-14T18:14:27+03:00"
       }
     }
   },
