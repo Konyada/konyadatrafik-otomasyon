@@ -366,10 +366,13 @@
         "guncelleme": "2026-11-15T08:52:24+03:00"
       },
       "08:45-eczane": {
-        "durum": "tekrar",
-        "mesaj": "12 eczanenin telefonu henüz bulunamadı; 15 dakika sonra tekrar denenecek.",
-        "medya": [],
-        "guncelleme": "2026-11-15T09:39:47+03:00"
+        "durum": "paylasildi",
+        "mesaj": "12 nöbetçi eczane, tek story (5. Bölge Konya Eczacı Odası; 0 telefonlu)",
+        "medya": [
+          "ig:17961138003263818",
+          "fb:1141967968763891"
+        ],
+        "guncelleme": "2026-11-15T10:51:19+03:00"
       },
       "09:30-haber-genel": {
         "durum": "atlandi",
