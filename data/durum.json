@@ -425,6 +425,17 @@
         ],
         "guncelleme": "2026-11-15T23:58:40+03:00"
       }
+    },
+    "2026-11-16": {
+      "08:00-soz": {
+        "durum": "paylasildi",
+        "mesaj": "Günün sözü: Dağ dağa kavuşmaz, insan insana kavuşur.",
+        "medya": [
+          "ig:18161803030508500",
+          "fb:925261283888113"
+        ],
+        "guncelleme": "2026-11-16T08:31:25+03:00"
+      }
     }
   },
   "vefat": {
