@@ -496,6 +496,23 @@
         ],
         "guncelleme": "2026-11-17T00:34:37+03:00"
       }
+    },
+    "2026-11-17": {
+      "08:00-soz": {
+        "durum": "paylasildi",
+        "mesaj": "Günün sözü: Davulun sesi uzaktan hoş gelir.",
+        "medya": [
+          "ig:18011258930990616",
+          "fb:2073456900040815"
+        ],
+        "guncelleme": "2026-11-17T08:58:06+03:00"
+      },
+      "08:45-eczane": {
+        "durum": "tekrar",
+        "mesaj": "12 eczanenin telefonu henüz bulunamadı; 15 dakika sonra tekrar denenecek.",
+        "medya": [],
+        "guncelleme": "2026-11-17T08:58:07+03:00"
+      }
     }
   },
   "vefat": {
