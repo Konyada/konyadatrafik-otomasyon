@@ -567,6 +567,23 @@
         ],
         "guncelleme": "2026-11-18T00:26:12+03:00"
       }
+    },
+    "2026-11-18": {
+      "08:00-soz": {
+        "durum": "paylasildi",
+        "mesaj": "Günün sözü: Gülü seven dikenine katlanır.",
+        "medya": [
+          "ig:18133102096860084",
+          "fb:2250261055837478"
+        ],
+        "guncelleme": "2026-11-18T09:00:06+03:00"
+      },
+      "08:45-eczane": {
+        "durum": "tekrar",
+        "mesaj": "12 eczanenin telefonu henüz bulunamadı; 15 dakika sonra tekrar denenecek.",
+        "medya": [],
+        "guncelleme": "2026-11-18T09:00:07+03:00"
+      }
     }
   },
   "vefat": {
