@@ -592,6 +592,12 @@
         "mesaj": "Claude API bakiyesi yetersiz (Claude Console'dan kredi yükleyin); haber atlandı.",
         "medya": [],
         "guncelleme": "2026-11-18T10:13:01+03:00"
+      },
+      "11:30-haber-trafik": {
+        "durum": "atlandi",
+        "mesaj": "Claude API bakiyesi yetersiz (Claude Console'dan kredi yükleyin); haber atlandı.",
+        "medya": [],
+        "guncelleme": "2026-11-18T11:30:33+03:00"
       }
     }
   },
