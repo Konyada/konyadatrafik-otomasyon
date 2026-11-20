@@ -758,6 +758,15 @@
           "fb:1125581820387064"
         ],
         "guncelleme": "2026-11-20T13:31:13+03:00"
+      },
+      "15:30-haber-genel": {
+        "durum": "paylasildi",
+        "mesaj": "[KAZA] Karapınar-Konya yolunda iki tır çarpıştı, sürücü kabinde sıkıştı — İHA (abone ajans/resmi kurum), fotoğraf: Foto: İHA — https://www.iha.com.tr/konya-haberleri/konyada-iki-tir-carpisti-surucu-yerinden-kopan-kabinde-sikisti-519035198",
+        "medya": [
+          "ig:18118725205838649",
+          "fb:2890977791303030"
+        ],
+        "guncelleme": "2026-11-20T16:47:59+03:00"
       }
     }
   },
@@ -961,6 +970,12 @@
       "baslik": "Büyükşehir'den öğrencilere umre ödüllü siyer yarışması: Kayıtlar başladı",
       "url": "https://www.konyaaktuel.com.tr/haber/konya-da-baskan-altaydan-ogrencilere-umre-odullu-siyer-firsati-400497/",
       "kategori": "BÜYÜKŞEHİR"
+    },
+    {
+      "tarih": "2026-11-20",
+      "baslik": "Karapınar-Konya yolunda iki tır çarpıştı, sürücü kabinde sıkıştı",
+      "url": "https://www.iha.com.tr/konya-haberleri/konyada-iki-tir-carpisti-surucu-yerinden-kopan-kabinde-sikisti-519035198",
+      "kategori": "KAZA"
     }
   ],
   "ayar": {
