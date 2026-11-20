@@ -767,6 +767,15 @@
           "fb:2890977791303030"
         ],
         "guncelleme": "2026-11-20T16:47:59+03:00"
+      },
+      "17:30-haber-konyaspor": {
+        "durum": "paylasildi",
+        "mesaj": "[KONYASPOR] Konyaspor'umuzdan Beşiktaş maçı öncesi 'çıkış' mesajı — Fotomaç (web), fotoğrafsız — https://www.fotomac.com.tr/konyaspor/2026/11/20/firsat-macimiz",
+        "medya": [
+          "ig:17919969879496363",
+          "fb:1848105099665188"
+        ],
+        "guncelleme": "2026-11-20T17:39:00+03:00"
       }
     }
   },
@@ -976,6 +985,12 @@
       "baslik": "Karapınar-Konya yolunda iki tır çarpıştı, sürücü kabinde sıkıştı",
       "url": "https://www.iha.com.tr/konya-haberleri/konyada-iki-tir-carpisti-surucu-yerinden-kopan-kabinde-sikisti-519035198",
       "kategori": "KAZA"
+    },
+    {
+      "tarih": "2026-11-20",
+      "baslik": "Konyaspor'umuzdan Beşiktaş maçı öncesi 'çıkış' mesajı",
+      "url": "https://www.fotomac.com.tr/konyaspor/2026/11/20/firsat-macimiz",
+      "kategori": "KONYASPOR"
     }
   ],
   "ayar": {
