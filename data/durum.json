@@ -740,6 +740,15 @@
         "mesaj": "Claude API bakiyesi yetersiz (Claude Console'dan kredi yükleyin); haber atlandı.",
         "medya": [],
         "guncelleme": "2026-11-20T11:30:54+03:00"
+      },
+      "12:30-haber-selcuklu": {
+        "durum": "paylasildi",
+        "mesaj": "[BELEDİYE] Selçuklu'nun iklim çalışmaları COP31 sahnesinde anlatıldı — Konya Postası (web), fotoğrafsız — https://www.konyapostasi.com.tr/konya-haberleri/pekyatirmacidan-cop31de-selcuklu-vizyonu/786418",
+        "medya": [
+          "ig:18135619397504655",
+          "fb:4084242978538597"
+        ],
+        "guncelleme": "2026-11-20T12:32:50+03:00"
       }
     }
   },
@@ -931,7 +940,14 @@
       "6f2d6e50475dd9eb"
     ]
   },
-  "haberler": [],
+  "haberler": [
+    {
+      "tarih": "2026-11-20",
+      "baslik": "Selçuklu'nun iklim çalışmaları COP31 sahnesinde anlatıldı",
+      "url": "https://www.konyapostasi.com.tr/konya-haberleri/pekyatirmacidan-cop31de-selcuklu-vizyonu/786418",
+      "kategori": "BELEDİYE"
+    }
+  ],
   "ayar": {
     "instagram_hesap_id": "17841404592475810"
   }
