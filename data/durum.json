@@ -749,6 +749,15 @@
           "fb:4084242978538597"
         ],
         "guncelleme": "2026-11-20T12:32:50+03:00"
+      },
+      "13:30-haber-buyuksehir": {
+        "durum": "paylasildi",
+        "mesaj": "[BÜYÜKŞEHİR] Büyükşehir'den öğrencilere umre ödüllü siyer yarışması: Kayıtlar başladı — Konya Aktüel (web), fotoğrafsız — https://www.konyaaktuel.com.tr/haber/konya-da-baskan-altaydan-ogrencilere-umre-odullu-siyer-firsati-400497/",
+        "medya": [
+          "ig:18124722142908965",
+          "fb:1125581820387064"
+        ],
+        "guncelleme": "2026-11-20T13:31:13+03:00"
       }
     }
   },
@@ -946,6 +955,12 @@
       "baslik": "Selçuklu'nun iklim çalışmaları COP31 sahnesinde anlatıldı",
       "url": "https://www.konyapostasi.com.tr/konya-haberleri/pekyatirmacidan-cop31de-selcuklu-vizyonu/786418",
       "kategori": "BELEDİYE"
+    },
+    {
+      "tarih": "2026-11-20",
+      "baslik": "Büyükşehir'den öğrencilere umre ödüllü siyer yarışması: Kayıtlar başladı",
+      "url": "https://www.konyaaktuel.com.tr/haber/konya-da-baskan-altaydan-ogrencilere-umre-odullu-siyer-firsati-400497/",
+      "kategori": "BÜYÜKŞEHİR"
     }
   ],
   "ayar": {
