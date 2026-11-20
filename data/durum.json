@@ -776,6 +776,13 @@
           "fb:1848105099665188"
         ],
         "guncelleme": "2026-11-20T17:39:00+03:00"
+      },
+      "19:30-haber-genel": {
+        "hata_sayisi": 1,
+        "guncelleme": "2026-11-20T19:43:10+03:00",
+        "durum": "hata",
+        "mesaj": "HaberHatasi: Model JSON döndürmedi: '{\"atla\": false, \"ajans_no\": 4, \"konum\": \"KULU\", \"kategori\": \"KAZA\", \"baslik\": \"Kulu\\'da feci kaza: Üniversite rektörünün eşi hayatını kaybetti\", \"etiketler\": [\"Konya-Kırıkkale yolu\", \"Kulu Makas Kavşağ'",
+        "medya": []
       }
     }
   },
