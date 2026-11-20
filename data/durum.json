@@ -779,10 +779,13 @@
       },
       "19:30-haber-genel": {
         "hata_sayisi": 1,
-        "guncelleme": "2026-11-20T19:43:10+03:00",
-        "durum": "hata",
-        "mesaj": "HaberHatasi: Model JSON döndürmedi: '{\"atla\": false, \"ajans_no\": 4, \"konum\": \"KULU\", \"kategori\": \"KAZA\", \"baslik\": \"Kulu\\'da feci kaza: Üniversite rektörünün eşi hayatını kaybetti\", \"etiketler\": [\"Konya-Kırıkkale yolu\", \"Kulu Makas Kavşağ'",
-        "medya": []
+        "guncelleme": "2026-11-20T20:42:15+03:00",
+        "durum": "paylasildi",
+        "mesaj": "[TRAFİK] Kışa hazırlık: Dört mevsim lastik, kış lastiğinin yerini tutmuyor — İHA (abone ajans/resmi kurum), fotoğraf: Foto: İHA — https://www.iha.com.tr/konya-haberleri/ne-yaz-ne-kis-lastik-dort-mevsim-olsun-diyenlere-uyari-518998520",
+        "medya": [
+          "ig:18031379468919839",
+          "fb:1132744792836111"
+        ]
       }
     }
   },
@@ -998,6 +1001,12 @@
       "baslik": "Konyaspor'umuzdan Beşiktaş maçı öncesi 'çıkış' mesajı",
       "url": "https://www.fotomac.com.tr/konyaspor/2026/11/20/firsat-macimiz",
       "kategori": "KONYASPOR"
+    },
+    {
+      "tarih": "2026-11-20",
+      "baslik": "Kışa hazırlık: Dört mevsim lastik, kış lastiğinin yerini tutmuyor",
+      "url": "https://www.iha.com.tr/konya-haberleri/ne-yaz-ne-kis-lastik-dort-mevsim-olsun-diyenlere-uyari-518998520",
+      "kategori": "TRAFİK"
     }
   ],
   "ayar": {
