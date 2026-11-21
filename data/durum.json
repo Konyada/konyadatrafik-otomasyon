@@ -817,8 +817,8 @@
         "guncelleme": "2026-11-21T10:04:10+03:00"
       },
       "09:30-haber-genel": {
-        "hata_sayisi": 1,
-        "guncelleme": "2026-11-21T10:04:45+03:00",
+        "hata_sayisi": 2,
+        "guncelleme": "2026-11-21T11:12:39+03:00",
         "durum": "hata",
         "mesaj": "HaberHatasi: Model JSON döndürmedi: ''",
         "medya": []
