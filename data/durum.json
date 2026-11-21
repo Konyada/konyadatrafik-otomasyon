@@ -796,6 +796,23 @@
         ],
         "guncelleme": "2026-11-21T00:21:38+03:00"
       }
+    },
+    "2026-11-21": {
+      "08:00-soz": {
+        "durum": "paylasildi",
+        "mesaj": "Günün sözü: Lafla peynir gemisi yürümez.",
+        "medya": [
+          "ig:18353460157285502",
+          "fb:1133619515940415"
+        ],
+        "guncelleme": "2026-11-21T08:55:04+03:00"
+      },
+      "08:45-eczane": {
+        "durum": "tekrar",
+        "mesaj": "11 eczanenin telefonu henüz bulunamadı; 15 dakika sonra tekrar denenecek.",
+        "medya": [],
+        "guncelleme": "2026-11-21T08:55:06+03:00"
+      }
     }
   },
   "vefat": {
