@@ -855,6 +855,15 @@
           "fb:1536315308563392"
         ],
         "guncelleme": "2026-11-21T15:52:16+03:00"
+      },
+      "17:30-haber-konyaspor": {
+        "durum": "paylasildi",
+        "mesaj": "[KONYASPOR] Konyaspor'umuz yarın Beşiktaş'ı ağırlıyor: 51. randevu — Ajansspor (web), fotoğrafsız — https://ajansspor.com/haber/besiktasin-konyaspor-maci-kamp-kadrosu-belli-oldu-739072",
+        "medya": [
+          "ig:17878731648586520",
+          "fb:1485300043500482"
+        ],
+        "guncelleme": "2026-11-21T17:34:22+03:00"
       }
     }
   },
@@ -1116,6 +1125,12 @@
       "baslik": "Beyşehir-Antalya yolunda zincirleme kaza: 10 yaralı",
       "url": "https://www.iha.com.tr/konya-haberleri/beysehirde-zincirleme-kazada-10-kisi-yaralandi-519559455",
       "kategori": "KAZA"
+    },
+    {
+      "tarih": "2026-11-21",
+      "baslik": "Konyaspor'umuz yarın Beşiktaş'ı ağırlıyor: 51. randevu",
+      "url": "https://ajansspor.com/haber/besiktasin-konyaspor-maci-kamp-kadrosu-belli-oldu-739072",
+      "kategori": "KONYASPOR"
     }
   ],
   "ayar": {
