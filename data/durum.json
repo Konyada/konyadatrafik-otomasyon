@@ -864,6 +864,15 @@
           "fb:1485300043500482"
         ],
         "guncelleme": "2026-11-21T17:34:22+03:00"
+      },
+      "19:30-haber-genel": {
+        "durum": "paylasildi",
+        "mesaj": "[SAĞLIK] Beyşehir'de gıda işletmelerine denetim: Hijyen kuralına uymayana ceza — İHA (abone ajans/resmi kurum), fotoğraf: Foto: İHA — https://www.iha.com.tr/konya-haberleri/beysehirde-gida-denetimleri-519554749",
+        "medya": [
+          "ig:17908121565351939",
+          "fb:1898832257813777"
+        ],
+        "guncelleme": "2026-11-21T19:46:18+03:00"
       }
     }
   },
@@ -1131,6 +1140,12 @@
       "baslik": "Konyaspor'umuz yarın Beşiktaş'ı ağırlıyor: 51. randevu",
       "url": "https://ajansspor.com/haber/besiktasin-konyaspor-maci-kamp-kadrosu-belli-oldu-739072",
       "kategori": "KONYASPOR"
+    },
+    {
+      "tarih": "2026-11-21",
+      "baslik": "Beyşehir'de gıda işletmelerine denetim: Hijyen kuralına uymayana ceza",
+      "url": "https://www.iha.com.tr/konya-haberleri/beysehirde-gida-denetimleri-519554749",
+      "kategori": "SAĞLIK"
     }
   ],
   "ayar": {
