@@ -846,6 +846,15 @@
         "mesaj": "Uygun ve yeni bir haber bulunamadı.",
         "medya": [],
         "guncelleme": "2026-11-21T13:31:53+03:00"
+      },
+      "15:30-haber-genel": {
+        "durum": "paylasildi",
+        "mesaj": "[KAZA] Beyşehir-Antalya yolunda zincirleme kaza: 10 yaralı — İHA (abone ajans/resmi kurum), fotoğraf: Foto: İHA — https://www.iha.com.tr/konya-haberleri/beysehirde-zincirleme-kazada-10-kisi-yaralandi-519559455",
+        "medya": [
+          "ig:18114685493231792",
+          "fb:1536315308563392"
+        ],
+        "guncelleme": "2026-11-21T15:52:16+03:00"
       }
     }
   },
@@ -1101,6 +1110,12 @@
       "baslik": "Selçuklu'da yüzme yarışları sona erdi: Minik yüzücüler havuzda yarıştı",
       "url": "https://www.selcuklu.bel.tr/p/haber/4424/selcuklu-belediyesi-yuzme-yarislari-sona-erdi/",
       "kategori": "BELEDİYE"
+    },
+    {
+      "tarih": "2026-11-21",
+      "baslik": "Beyşehir-Antalya yolunda zincirleme kaza: 10 yaralı",
+      "url": "https://www.iha.com.tr/konya-haberleri/beysehirde-zincirleme-kazada-10-kisi-yaralandi-519559455",
+      "kategori": "KAZA"
     }
   ],
   "ayar": {
