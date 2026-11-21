@@ -831,6 +831,15 @@
           "fb:30685537674380213"
         ],
         "guncelleme": "2026-11-21T12:03:09+03:00"
+      },
+      "12:30-haber-selcuklu": {
+        "durum": "paylasildi",
+        "mesaj": "[BELEDİYE] Selçuklu'da yüzme yarışları sona erdi: Minik yüzücüler havuzda yarıştı — Selçuklu Belediyesi (abone ajans/resmi kurum), fotoğraf: Foto: Selçuklu Belediyesi — https://www.selcuklu.bel.tr/p/haber/4424/selcuklu-belediyesi-yuzme-yarislari-sona-erdi/",
+        "medya": [
+          "ig:17901302700394932",
+          "fb:1461366876191750"
+        ],
+        "guncelleme": "2026-11-21T12:47:47+03:00"
       }
     }
   },
@@ -1080,6 +1089,12 @@
       "baslik": "Antalya Çevre Yolu Caddesi'nde 23-24 Kasım'da yol daralacak",
       "url": "https://www.anadoludabugun.com.tr/konya-haberleri/konyada-bu-yolu-kullanacaklar-dikkat-23-kasimda-basliyor/423487",
       "kategori": "TRAFİK"
+    },
+    {
+      "tarih": "2026-11-21",
+      "baslik": "Selçuklu'da yüzme yarışları sona erdi: Minik yüzücüler havuzda yarıştı",
+      "url": "https://www.selcuklu.bel.tr/p/haber/4424/selcuklu-belediyesi-yuzme-yarislari-sona-erdi/",
+      "kategori": "BELEDİYE"
     }
   ],
   "ayar": {
