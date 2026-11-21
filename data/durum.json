@@ -822,6 +822,15 @@
         "durum": "hata",
         "mesaj": "HaberHatasi: Model JSON döndürmedi: ''",
         "medya": []
+      },
+      "11:30-haber-trafik": {
+        "durum": "paylasildi",
+        "mesaj": "[TRAFİK] Antalya Çevre Yolu Caddesi'nde 23-24 Kasım'da yol daralacak — Anadolu'da Bugün (web), fotoğrafsız — https://www.anadoludabugun.com.tr/konya-haberleri/konyada-bu-yolu-kullanacaklar-dikkat-23-kasimda-basliyor/423487",
+        "medya": [
+          "ig:18008586413793792",
+          "fb:30685537674380213"
+        ],
+        "guncelleme": "2026-11-21T12:03:09+03:00"
       }
     }
   },
@@ -1064,6 +1073,12 @@
       "tarih": "2026-11-20",
       "baslik": "Kışa hazırlık: Dört mevsim lastik, kış lastiğinin yerini tutmuyor",
       "url": "https://www.iha.com.tr/konya-haberleri/ne-yaz-ne-kis-lastik-dort-mevsim-olsun-diyenlere-uyari-518998520",
+      "kategori": "TRAFİK"
+    },
+    {
+      "tarih": "2026-11-21",
+      "baslik": "Antalya Çevre Yolu Caddesi'nde 23-24 Kasım'da yol daralacak",
+      "url": "https://www.anadoludabugun.com.tr/konya-haberleri/konyada-bu-yolu-kullanacaklar-dikkat-23-kasimda-basliyor/423487",
       "kategori": "TRAFİK"
     }
   ],
