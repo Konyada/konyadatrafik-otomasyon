@@ -808,10 +808,20 @@
         "guncelleme": "2026-11-21T08:55:04+03:00"
       },
       "08:45-eczane": {
-        "durum": "tekrar",
-        "mesaj": "11 eczanenin telefonu henüz bulunamadı; 15 dakika sonra tekrar denenecek.",
-        "medya": [],
-        "guncelleme": "2026-11-21T08:55:06+03:00"
+        "durum": "paylasildi",
+        "mesaj": "12 nöbetçi eczane, tek story (5. Bölge Konya Eczacı Odası; telefon/adres: posta.com.tr; 1 telefonlu)",
+        "medya": [
+          "ig:18120143903100492",
+          "fb:1090441747361911"
+        ],
+        "guncelleme": "2026-11-21T10:04:10+03:00"
+      },
+      "09:30-haber-genel": {
+        "hata_sayisi": 1,
+        "guncelleme": "2026-11-21T10:04:45+03:00",
+        "durum": "hata",
+        "mesaj": "HaberHatasi: Model JSON döndürmedi: ''",
+        "medya": []
       }
     }
   },
