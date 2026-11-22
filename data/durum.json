@@ -926,6 +926,13 @@
         "durum": "atlandi",
         "mesaj": "Uygun ve yeni bir haber bulunamadı.",
         "medya": []
+      },
+      "15:30-haber-genel": {
+        "hata_sayisi": 1,
+        "guncelleme": "2026-11-22T15:50:34+03:00",
+        "durum": "hata",
+        "mesaj": "InstagramHatasi: Graph API hatası (HTTP 401, kod 190/None): Error validating application. Application has been deleted.",
+        "medya": []
       }
     }
   },
