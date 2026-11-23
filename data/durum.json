@@ -1020,8 +1020,8 @@
         "medya": []
       },
       "23:50-vefat": {
-        "hata_sayisi": 1,
-        "guncelleme": "2026-11-23T23:51:03+03:00",
+        "hata_sayisi": 2,
+        "guncelleme": "2026-11-24T00:36:49+03:00",
         "durum": "hata",
         "mesaj": "InstagramHatasi: Graph API hatası (HTTP 401, kod 190/None): Error validating application. Application has been deleted.",
         "medya": []
@@ -1029,21 +1029,6 @@
     }
   },
   "vefat": {
-    "2026-11-09": [
-      "e6342714fcb35280",
-      "2f02e8f57d42a50b",
-      "c6d7be15ad13bae5",
-      "f6ca8641f01eef15",
-      "38a8b59e1a2de731",
-      "47faaaca6015ac29",
-      "f2e80234eb98d398",
-      "b6a00797d0f01156",
-      "e9907fc61837f920",
-      "cb7e20e3bebd02b7",
-      "28995cf94ed6c0c0",
-      "f5bcfd84827efa3b",
-      "cfceb276a44d33a9"
-    ],
     "2026-11-10": [
       "be32f321123c937d",
       "f6ec88343f706c89",
