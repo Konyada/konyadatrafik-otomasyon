@@ -1084,8 +1084,8 @@
         "medya": []
       },
       "19:30-haber-genel": {
-        "hata_sayisi": 1,
-        "guncelleme": "2026-11-24T20:07:17+03:00",
+        "hata_sayisi": 2,
+        "guncelleme": "2026-11-24T20:57:06+03:00",
         "durum": "hata",
         "mesaj": "InstagramHatasi: Graph API hatası (HTTP 401, kod 190/None): Error validating application. Application has been deleted.",
         "medya": []
