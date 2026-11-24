@@ -1077,8 +1077,8 @@
         "medya": []
       },
       "17:30-haber-konyaspor": {
-        "hata_sayisi": 1,
-        "guncelleme": "2026-11-24T18:00:59+03:00",
+        "hata_sayisi": 2,
+        "guncelleme": "2026-11-24T19:06:10+03:00",
         "durum": "hata",
         "mesaj": "InstagramHatasi: Graph API hatası (HTTP 401, kod 190/None): Error validating application. Application has been deleted.",
         "medya": []
