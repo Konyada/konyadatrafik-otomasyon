@@ -1050,15 +1050,22 @@
         "medya": []
       },
       "11:30-haber-trafik": {
-        "hata_sayisi": 2,
-        "guncelleme": "2026-11-25T12:53:59+03:00",
-        "durum": "hata",
+        "hata_sayisi": 3,
+        "guncelleme": "2026-11-25T13:57:49+03:00",
+        "durum": "hata_kalici",
         "mesaj": "InstagramHatasi: Graph API hatası (HTTP 401, kod 190/None): Error validating application. Application has been deleted.",
         "medya": []
       },
       "12:30-haber-selcuklu": {
+        "hata_sayisi": 2,
+        "guncelleme": "2026-11-25T13:58:08+03:00",
+        "durum": "hata",
+        "mesaj": "InstagramHatasi: Graph API hatası (HTTP 401, kod 190/None): Error validating application. Application has been deleted.",
+        "medya": []
+      },
+      "13:30-haber-buyuksehir": {
         "hata_sayisi": 1,
-        "guncelleme": "2026-11-25T12:54:18+03:00",
+        "guncelleme": "2026-11-25T13:58:31+03:00",
         "durum": "hata",
         "mesaj": "InstagramHatasi: Graph API hatası (HTTP 401, kod 190/None): Error validating application. Application has been deleted.",
         "medya": []
