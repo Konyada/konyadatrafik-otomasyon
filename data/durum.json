@@ -1030,11 +1030,17 @@
     },
     "2026-11-26": {
       "08:00-soz": {
-        "hata_sayisi": 1,
-        "guncelleme": "2026-11-26T08:05:42+03:00",
+        "hata_sayisi": 2,
+        "guncelleme": "2026-11-26T09:02:35+03:00",
         "durum": "hata",
         "mesaj": "InstagramHatasi: Graph API hatası (HTTP 401, kod 190/None): Error validating application. Application has been deleted.",
         "medya": []
+      },
+      "08:45-eczane": {
+        "durum": "tekrar",
+        "mesaj": "12 eczanenin telefonu henüz bulunamadı; 15 dakika sonra tekrar denenecek.",
+        "medya": [],
+        "guncelleme": "2026-11-26T09:02:37+03:00"
       }
     }
   },
