@@ -1,76 +1,5 @@
 {
   "gunler": {
-    "2026-11-12": {
-      "08:00-soz": {
-        "durum": "paylasildi",
-        "mesaj": "Günün sözü: Akıl akıldan üstündür.",
-        "medya": [
-          "ig:18160480351508359",
-          "fb:1452844757024654"
-        ],
-        "guncelleme": "2026-11-12T08:58:57+03:00"
-      },
-      "08:45-eczane": {
-        "durum": "paylasildi",
-        "mesaj": "12 nöbetçi eczane, tek story (5. Bölge Konya Eczacı Odası; telefon/adres: posta.com.tr; 0 telefonlu)",
-        "medya": [
-          "ig:18093941495224364",
-          "fb:1792088388686467"
-        ],
-        "guncelleme": "2026-11-12T10:11:13+03:00"
-      },
-      "09:30-haber-genel": {
-        "durum": "atlandi",
-        "mesaj": "Claude API bakiyesi yetersiz (Claude Console'dan kredi yükleyin); haber atlandı.",
-        "medya": [],
-        "guncelleme": "2026-11-12T10:11:28+03:00"
-      },
-      "11:30-haber-trafik": {
-        "durum": "atlandi",
-        "mesaj": "Claude API bakiyesi yetersiz (Claude Console'dan kredi yükleyin); haber atlandı.",
-        "medya": [],
-        "guncelleme": "2026-11-12T12:30:16+03:00"
-      },
-      "12:30-haber-selcuklu": {
-        "durum": "atlandi",
-        "mesaj": "Claude API bakiyesi yetersiz (Claude Console'dan kredi yükleyin); haber atlandı.",
-        "medya": [],
-        "guncelleme": "2026-11-12T12:30:23+03:00"
-      },
-      "13:30-haber-buyuksehir": {
-        "durum": "atlandi",
-        "mesaj": "Claude API bakiyesi yetersiz (Claude Console'dan kredi yükleyin); haber atlandı.",
-        "medya": [],
-        "guncelleme": "2026-11-12T13:30:58+03:00"
-      },
-      "15:30-haber-genel": {
-        "durum": "atlandi",
-        "mesaj": "Claude API bakiyesi yetersiz (Claude Console'dan kredi yükleyin); haber atlandı.",
-        "medya": [],
-        "guncelleme": "2026-11-12T16:47:27+03:00"
-      },
-      "17:30-haber-konyaspor": {
-        "durum": "atlandi",
-        "mesaj": "Claude API bakiyesi yetersiz (Claude Console'dan kredi yükleyin); haber atlandı.",
-        "medya": [],
-        "guncelleme": "2026-11-12T17:38:37+03:00"
-      },
-      "19:30-haber-genel": {
-        "durum": "atlandi",
-        "mesaj": "Claude API bakiyesi yetersiz (Claude Console'dan kredi yükleyin); haber atlandı.",
-        "medya": [],
-        "guncelleme": "2026-11-12T19:44:32+03:00"
-      },
-      "23:50-vefat": {
-        "durum": "paylasildi",
-        "mesaj": "12 Kasım 2026 Perşembe: 15 vefat kaydı, tek story",
-        "medya": [
-          "ig:18137385730808615",
-          "fb:1169190686068675"
-        ],
-        "guncelleme": "2026-11-13T00:21:45+03:00"
-      }
-    },
     "2026-11-13": {
       "08:00-soz": {
         "durum": "paylasildi",
@@ -1093,8 +1022,8 @@
         "medya": []
       },
       "23:50-vefat": {
-        "hata_sayisi": 1,
-        "guncelleme": "2026-11-26T23:54:24+03:00",
+        "hata_sayisi": 2,
+        "guncelleme": "2026-11-27T00:53:47+03:00",
         "durum": "hata",
         "mesaj": "InstagramHatasi: Graph API hatası (HTTP 401, kod 190/None): Error validating application. Application has been deleted.",
         "medya": []
@@ -1102,23 +1031,6 @@
     }
   },
   "vefat": {
-    "2026-11-12": [
-      "f9b3b4013ce88ced",
-      "5f5320c4492990ab",
-      "2a6a89309096173b",
-      "b937a3fb1c7ecaa2",
-      "4ba3db04a74885fe",
-      "64121b0962804727",
-      "1789684458a7746a",
-      "049ec3ab2f597ebb",
-      "8057ce0be5461d15",
-      "d09832821b42d38c",
-      "73b352ce78019803",
-      "5dd3d215f7534ebe",
-      "6fdb4ab1f49e58ac",
-      "e7188edad09f5e0f",
-      "69b532472ebdeeb3"
-    ],
     "2026-11-13": [
       "92d0ef09dfb0e024",
       "86981bfbae9ccba1",
